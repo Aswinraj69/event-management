@@ -11,6 +11,11 @@ import { UserRole, CompanyStatus } from '@prisma/client';
 export class SuperAdminController {
   constructor(private superAdminService: SuperAdminService) {}
 
+  @Get('stats')
+  async getPlatformStats() {
+    return this.superAdminService.getPlatformStats();
+  }
+
   @Get('registrations')
   async listRegistrations() {
     return this.superAdminService.listRegistrations();

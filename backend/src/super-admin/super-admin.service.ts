@@ -156,6 +156,33 @@ export class SuperAdminService {
     });
   }
 
+  async getPlatformStats() {
+    const [totalCompanies, pendingRegistrations, approvedCompanies, suspendedCompanies, totalUsers, totalEvents, totalClients, recentRegistrations] = await Promise.all([
+      this.prisma.company.count(),
+      this.prisma.companyRegistration.count({ where: { status: CompanyStatus.PENDING } }),
+      this.prisma.company.count({ where: { status: CompanyStatus.APPROVED } }),
+      this.prisma.company.count({ where: { status: CompanyStatus.SUSPENDED } }),
+      this.prisma.user.count(),
+      this.prisma.event.count(),
+      this.prisma.client.count(),
+      this.prisma.companyRegistration.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+      }),
+    ]);
+
+    return {
+      totalCompanies,
+      pendingRegistrations,
+      approvedCompanies,
+      suspendedCompanies,
+      totalUsers,
+      totalEvents,
+      totalClients,
+      recentRegistrations,
+    };
+  }
+
   async toggleCompanyStatus(id: string, status: CompanyStatus) {
     const company = await this.prisma.company.findUnique({
       where: { id },

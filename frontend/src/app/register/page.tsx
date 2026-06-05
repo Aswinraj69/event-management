@@ -3,12 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Camera, ArrowLeft, ArrowRight, ShieldCheck, HelpCircle } from 'lucide-react';
-import dynamic from 'next/dynamic';
-
-const Hero3D = dynamic(() => import('../../components/Hero3D'), {
-  ssr: false,
-  loading: () => <div className="absolute inset-0 w-full h-full -z-10 bg-[#020617] animate-pulse" />
-});
+import CosmicBackground from '../../components/Hero3D';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -62,7 +57,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-transparent flex flex-col md:flex-row relative overflow-hidden">
-      <Hero3D />
+      <CosmicBackground />
       {/* Background glow effects */}
       <div className="absolute top-[20%] left-[5%] w-[40%] h-[40%] bg-[#6d28d9]/10 rounded-full blur-[120px] pointer-events-none" />
 

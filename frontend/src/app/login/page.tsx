@@ -4,12 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Camera, Building2, UserSquare2, Eye, EyeOff, Loader2, ArrowRight, KeyRound } from 'lucide-react';
-import dynamic from 'next/dynamic';
-
-const Hero3D = dynamic(() => import('../../components/Hero3D'), {
-  ssr: false,
-  loading: () => <div className="absolute inset-0 w-full h-full -z-10 bg-[#020617] animate-pulse" />
-});
+import CosmicBackground from '../../components/Hero3D';
 
 function LoginContent() {
   const router = useRouter();
@@ -167,7 +162,7 @@ function LoginContent() {
 
   return (
     <div className="min-h-screen bg-transparent flex flex-col justify-center items-center p-6 relative overflow-hidden">
-      <Hero3D />
+      <CosmicBackground />
       {/* Dynamic glow using company primary brand color */}
       <div
         className="absolute top-[20%] w-[350px] h-[350px] rounded-full blur-[100px] pointer-events-none opacity-20"

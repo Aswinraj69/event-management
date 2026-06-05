@@ -1,13 +1,8 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { ArrowRight, Camera, ShieldCheck, CalendarDays, FileText, Zap, Star } from 'lucide-react';
-
-const Hero3D = dynamic(() => import('../components/Hero3D'), {
-  ssr: false,
-  loading: () => <div className="fixed inset-0 w-full h-full -z-10 bg-[#020617] animate-pulse" />
-});
+import CosmicBackground from '../components/Hero3D';
 
 const features = [
   {
@@ -61,7 +56,7 @@ export default function LandingPage() {
   return (
     <div className="relative min-h-screen overflow-x-hidden text-white">
       {/* Animated 3D cosmic background */}
-      <Hero3D />
+      <CosmicBackground />
 
       {/* Noise/grain overlay for depth */}
       <div

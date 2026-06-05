@@ -3,12 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Camera, ShieldCheck, Check, Ban, FileClock, ClipboardCopy, Building2, LogOut, Loader2 } from 'lucide-react';
-import dynamic from 'next/dynamic';
-
-const Hero3D = dynamic(() => import('../components/Hero3D'), {
-  ssr: false,
-  loading: () => <div className="absolute inset-0 w-full h-full -z-10 bg-[#020617] animate-pulse" />
-});
+import CosmicBackground from '../components/Hero3D';
 
 export default function SuperAdminPage() {
   const [token, setToken] = useState('');
@@ -145,7 +140,7 @@ export default function SuperAdminPage() {
   if (!token) {
     return (
       <div className="min-h-screen bg-transparent flex flex-col justify-center items-center p-6 relative overflow-hidden">
-        <Hero3D />
+        <CosmicBackground />
         <div className="absolute top-[20%] w-[350px] h-[350px] bg-violet-600/10 rounded-full blur-[100px] pointer-events-none" />
         
         <div className="w-full max-w-md glass-panel p-8 rounded-2xl shadow-xl shadow-black/50 z-10">
@@ -206,7 +201,7 @@ export default function SuperAdminPage() {
   // 2. ADMIN PORTAL SCREEN
   return (
     <div className="min-h-screen bg-transparent flex relative overflow-hidden">
-      <Hero3D />
+      <CosmicBackground />
       {/* Sidebar */}
       <aside className="w-64 bg-black/50 backdrop-blur-3xl border-r border-white/10 flex flex-col justify-between p-6 z-10 relative">
         <div>
@@ -451,3 +446,4 @@ export default function SuperAdminPage() {
     </div>
   );
 }
+

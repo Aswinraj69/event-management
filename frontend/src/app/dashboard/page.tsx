@@ -29,7 +29,7 @@ export default function DashboardPage() {
 
   const fetchStats = async (token: string) => {
     try {
-      const res = await fetch('http://localhost:5000/api/invoices/stats', {
+      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/invoices/stats`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -43,7 +43,7 @@ export default function DashboardPage() {
 
   const fetchBranding = async (token: string) => {
     try {
-      const res = await fetch('http://localhost:5000/api/company/branding', {
+      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/company/branding`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -95,7 +95,7 @@ export default function DashboardPage() {
     setSuccessMsg('');
     const token = localStorage.getItem('evento_token');
     try {
-      const res = await fetch('http://localhost:5000/api/company/branding', {
+      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/company/branding`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

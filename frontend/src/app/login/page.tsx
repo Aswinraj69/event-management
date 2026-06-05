@@ -27,7 +27,7 @@ function LoginContent() {
   const resolveSubdomainBranding = async (sub: string) => {
     if (!sub) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/company/public/${sub}`);
+      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/company/public/${sub}`);
       if (!res.ok) {
         throw new Error('Subdomain not registered');
       }
@@ -61,7 +61,7 @@ function LoginContent() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
+      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

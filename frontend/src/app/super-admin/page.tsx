@@ -22,7 +22,7 @@ export default function SuperAdminPage() {
     setLoading(true);
     setLoginError('');
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
+      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -48,14 +48,14 @@ export default function SuperAdminPage() {
     if (!token) return;
     try {
       // Fetch registrations
-      const regRes = await fetch('http://localhost:5000/api/super-admin/registrations', {
+      const regRes = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/super-admin/registrations`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const regData = await regRes.json();
       if (regRes.ok) setRegistrations(regData);
 
       // Fetch companies
-      const compRes = await fetch('http://localhost:5000/api/super-admin/companies', {
+      const compRes = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/super-admin/companies`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const compData = await compRes.json();
@@ -80,7 +80,7 @@ export default function SuperAdminPage() {
 
   const handleApprove = async (id: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/super-admin/registrations/${id}/approve`, {
+      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/super-admin/registrations/${id}/approve`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -99,7 +99,7 @@ export default function SuperAdminPage() {
   const handleReject = async (id: string) => {
     if (!confirm('Are you sure you want to reject this registration?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/super-admin/registrations/${id}/reject`, {
+      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/super-admin/registrations/${id}/reject`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -114,7 +114,7 @@ export default function SuperAdminPage() {
   const handleToggleStatus = async (id: string, currentStatus: string) => {
     const nextStatus = currentStatus === 'APPROVED' ? 'SUSPENDED' : 'APPROVED';
     try {
-      const res = await fetch(`http://localhost:5000/api/super-admin/companies/${id}/status`, {
+      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/super-admin/companies/${id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

@@ -28,7 +28,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     // Fetch branding configurations
     if (parsedUser.companyId) {
-      fetch('http://localhost:5000/api/company/branding', {
+      fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/company/branding`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then(res => res.json())

@@ -19,7 +19,7 @@ export default function AvailabilityPage() {
     if (savedUser) setUser(JSON.parse(savedUser));
 
     try {
-      const res = await fetch('http://localhost:5000/api/availability', {
+      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/availability`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) setAvailabilities(await res.json());
@@ -38,7 +38,7 @@ export default function AvailabilityPage() {
     e.preventDefault();
     const token = localStorage.getItem('evento_token');
     try {
-      const res = await fetch('http://localhost:5000/api/availability', {
+      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/availability`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ export default function AvailabilityPage() {
     if (!confirm('Remove this block out period?')) return;
     const token = localStorage.getItem('evento_token');
     try {
-      const res = await fetch(`http://localhost:5000/api/availability/${id}`, {
+      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/availability/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

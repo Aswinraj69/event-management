@@ -409,7 +409,7 @@ export default function SuperAdminPage() {
 
                     <div className="flex justify-between items-center">
                       <Link
-                        href={`${process.env.NEXT_PUBLIC_TENANT_APP_URL || 'http://localhost:3000'}/login?subdomain=${comp.subdomain}`}
+                        href={`${process.env.NEXT_PUBLIC_TENANT_APP_URL || 'https://event-management-xi-swart.vercel.app'}/login?subdomain=${comp.subdomain}`}
                         target="_blank"
                         className="text-xs text-violet-400 hover:text-violet-300 font-semibold"
                       >

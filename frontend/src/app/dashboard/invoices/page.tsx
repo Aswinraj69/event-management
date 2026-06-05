@@ -29,17 +29,17 @@ export default function InvoicesPage() {
   const fetchData = async () => {
     const token = localStorage.getItem('evento_token');
     try {
-      const invRes = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/invoices`, {
+      const invRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/invoices`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (invRes.ok) setInvoices(await invRes.json());
 
-      const cRes = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/clients`, {
+      const cRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/clients`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (cRes.ok) setClients(await cRes.json());
 
-      const eRes = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/events`, {
+      const eRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/events`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (eRes.ok) setEvents(await eRes.json());
@@ -67,7 +67,7 @@ export default function InvoicesPage() {
     };
 
     try {
-      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/invoices`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/invoices`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ export default function InvoicesPage() {
     };
 
     try {
-      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/invoices/${selectedInv.id}/payments`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/invoices/${selectedInv.id}/payments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

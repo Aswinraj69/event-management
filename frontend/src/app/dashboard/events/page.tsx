@@ -35,7 +35,7 @@ export default function EventsPage() {
     const token = localStorage.getItem('evento_token');
     try {
       // 1. Fetch Events
-      const evRes = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/events`, {
+      const evRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/events`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (evRes.ok) {
@@ -48,7 +48,7 @@ export default function EventsPage() {
       setUser(u);
 
       if (u.role === 'COMPANY_ADMIN') {
-        const clRes = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/clients`, {
+        const clRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/clients`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (clRes.ok) {
@@ -57,7 +57,7 @@ export default function EventsPage() {
         }
 
         // 3. Fetch Employees for assignment pool
-        const empRes = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/employees`, {
+        const empRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/employees`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (empRes.ok) {
@@ -88,7 +88,7 @@ export default function EventsPage() {
     e.preventDefault();
     const token = localStorage.getItem('evento_token');
     try {
-      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/events`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/events`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ export default function EventsPage() {
     setAssignmentError('');
     const token = localStorage.getItem('evento_token');
     try {
-      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/events/${selectedEvent.id}/staff`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/events/${selectedEvent.id}/staff`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -176,7 +176,7 @@ export default function EventsPage() {
   const handleResponse = async (assignmentId: string, nextStatus: 'ACCEPTED' | 'DECLINED') => {
     const token = localStorage.getItem('evento_token');
     try {
-      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/events/assignments/${assignmentId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/events/assignments/${assignmentId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

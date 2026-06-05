@@ -24,17 +24,17 @@ export default function QuotationsPage() {
   const fetchData = async () => {
     const token = localStorage.getItem('evento_token');
     try {
-      const qRes = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/quotations`, {
+      const qRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/quotations`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (qRes.ok) setQuotations(await qRes.json());
 
-      const cRes = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/clients`, {
+      const cRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/clients`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (cRes.ok) setClients(await cRes.json());
 
-      const eRes = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/events`, {
+      const eRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/events`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (eRes.ok) setEvents(await eRes.json());
@@ -80,7 +80,7 @@ export default function QuotationsPage() {
     };
 
     try {
-      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/quotations`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/quotations`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ export default function QuotationsPage() {
   const handleUpdateStatus = async (id: string, status: string) => {
     const token = localStorage.getItem('evento_token');
     try {
-      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/quotations/${id}/status`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/quotations/${id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

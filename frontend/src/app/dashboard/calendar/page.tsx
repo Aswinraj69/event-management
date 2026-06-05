@@ -28,7 +28,7 @@ export default function CalendarPage() {
   const fetchEvents = async () => {
     const token = localStorage.getItem('evento_token');
     try {
-      const res = await fetch(`\${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/events`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/events`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {

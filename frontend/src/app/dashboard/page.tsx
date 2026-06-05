@@ -144,8 +144,8 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8 animate-fade-in">
       <header>
-        <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">Dashboard Overview</h1>
-        <p className="text-gray-500 text-sm mt-1">Welcome back. Here is a summary of your operations and invoices.</p>
+        <h1 className="text-3xl font-extrabold tracking-tight text-white">Dashboard Overview</h1>
+        <p className="text-gray-400 text-sm mt-1">Welcome back. Here is a summary of your operations and invoices.</p>
       </header>
 
       {/* Numerical Cards */}
@@ -155,7 +155,7 @@ export default function DashboardPage() {
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Revenue</p>
-              <h3 className="text-2xl font-bold text-gray-900 mt-1">AED {stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
+              <h3 className="text-2xl font-bold text-white mt-1">AED {stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
             </div>
             <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl">
               <DollarSign className="w-5 h-5" />
@@ -169,7 +169,7 @@ export default function DashboardPage() {
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">Outstanding Balance</p>
-              <h3 className="text-2xl font-bold text-gray-900 mt-1">AED {stats.totalOutstanding.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
+              <h3 className="text-2xl font-bold text-white mt-1">AED {stats.totalOutstanding.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
             </div>
             <div className="p-2 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-xl">
               <Wallet className="w-5 h-5" />
@@ -183,7 +183,7 @@ export default function DashboardPage() {
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">Paid Invoices</p>
-              <h3 className="text-2xl font-bold text-gray-900 mt-1">{stats.paidInvoicesCount}</h3>
+              <h3 className="text-2xl font-bold text-white mt-1">{stats.paidInvoicesCount}</h3>
             </div>
             <div className="p-2 bg-violet-500/10 border border-violet-500/20 text-violet-400 rounded-xl">
               <CreditCard className="w-5 h-5" />
@@ -197,7 +197,7 @@ export default function DashboardPage() {
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">Pending Accounts</p>
-              <h3 className="text-2xl font-bold text-gray-900 mt-1">{stats.pendingInvoicesCount}</h3>
+              <h3 className="text-2xl font-bold text-white mt-1">{stats.pendingInvoicesCount}</h3>
             </div>
             <div className="p-2 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 rounded-xl">
               <CalendarRange className="w-5 h-5" />
@@ -211,7 +211,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Income Chart */}
         <div className="glass-panel p-6 rounded-2xl lg:col-span-2">
-          <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-6">Revenue Growth Trend</h4>
+          <h4 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-6">Revenue Growth Trend</h4>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -234,30 +234,30 @@ export default function DashboardPage() {
         {/* Company Settings Summary */}
         <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between">
           <div>
-            <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">Tenant Parameters</h4>
+            <h4 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4">Tenant Parameters</h4>
             <div className="space-y-4 text-xs">
-              <div className="flex justify-between py-2 border-b border-gray-200">
+              <div className="flex justify-between py-2 border-b border-white/[0.04]">
                 <span className="text-gray-500">Instance Domain</span>
-                <span className="font-mono text-gray-900 text-right">{branding.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.evento.com</span>
+                <span className="font-mono text-white text-right">{branding.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.evento.com</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-gray-200">
+              <div className="flex justify-between py-2 border-b border-white/[0.04]">
                 <span className="text-gray-500">VAT Reg Number</span>
-                <span className="font-semibold text-gray-900 text-right">{branding.vatNumber || 'Not Configured'}</span>
+                <span className="font-semibold text-white text-right">{branding.vatNumber || 'Not Configured'}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-gray-200">
+              <div className="flex justify-between py-2 border-b border-white/[0.04]">
                 <span className="text-gray-500">Office Location</span>
-                <span className="font-semibold text-gray-900 text-right truncate max-w-[150px]">{branding.address || 'Not Configured'}</span>
+                <span className="font-semibold text-white text-right truncate max-w-[150px]">{branding.address || 'Not Configured'}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-gray-200">
+              <div className="flex justify-between py-2 border-b border-white/[0.04]">
                 <span className="text-gray-500">Corporate Email</span>
-                <span className="font-semibold text-gray-900 text-right">{user?.email}</span>
+                <span className="font-semibold text-white text-right">{user?.email}</span>
               </div>
             </div>
           </div>
           
-          <div className="mt-6 p-4 bg-white border border-gray-200 rounded-xl flex items-center gap-3">
+          <div className="mt-6 p-4 bg-white/[0.01] border border-white/[0.05] rounded-xl flex items-center gap-3">
             <Palette className="w-5 h-5 text-violet-400 shrink-0" />
-            <div className="text-[10px] text-gray-500 leading-normal">
+            <div className="text-[10px] text-gray-400 leading-normal">
               Theme updates automatically propagate to your emails, quotation sheets, invoices, and login portals.
             </div>
           </div>
@@ -267,13 +267,13 @@ export default function DashboardPage() {
       {/* Branding Configuration Dashboard Module */}
       {isAdmin && (
         <div className="glass-panel p-8 rounded-2xl">
-          <div className="mb-6 flex items-center justify-between border-b border-gray-200 pb-4">
+          <div className="mb-6 flex items-center justify-between border-b border-white/[0.05] pb-4">
             <div className="flex gap-3 items-center">
               <div className="p-2 bg-violet-600/10 border border-violet-500/20 text-violet-400 rounded-xl">
                 <Palette className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-900">Company Branding Module</h3>
+                <h3 className="text-lg font-bold text-white">Company Branding Module</h3>
                 <p className="text-xs text-gray-500 mt-0.5">Customize your company logo, color tokens, and corporate details.</p>
               </div>
             </div>
@@ -288,52 +288,52 @@ export default function DashboardPage() {
           <form onSubmit={handleSaveBranding} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Company Name</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Company Name</label>
                 <input
                   type="text"
                   name="name"
                   required
                   value={branding.name}
                   onChange={handleBrandingChange}
-                  className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:outline-none focus:border-violet-500 text-sm text-gray-900"
+                  className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:outline-none focus:border-violet-500 text-sm text-white"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Corporate Website</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Corporate Website</label>
                 <input
                   type="text"
                   name="website"
                   value={branding.website}
                   onChange={handleBrandingChange}
-                  className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:outline-none focus:border-violet-500 text-sm text-gray-900"
+                  className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:outline-none focus:border-violet-500 text-sm text-white"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">VAT Number</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">VAT Number</label>
                 <input
                   type="text"
                   name="vatNumber"
                   value={branding.vatNumber}
                   onChange={handleBrandingChange}
-                  className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:outline-none focus:border-violet-500 text-sm text-gray-900"
+                  className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:outline-none focus:border-violet-500 text-sm text-white"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2">
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Logo URL (Unsplash or direct asset)</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Logo URL (Unsplash or direct asset)</label>
                 <input
                   type="text"
                   name="logoUrl"
                   placeholder="https://..."
                   value={branding.logoUrl}
                   onChange={handleBrandingChange}
-                  className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:outline-none focus:border-violet-500 text-sm text-gray-900"
+                  className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:outline-none focus:border-violet-500 text-sm text-white"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Primary Brand Color</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Primary Brand Color</label>
                 <div className="flex gap-3">
                   <input
                     type="color"
@@ -345,20 +345,20 @@ export default function DashboardPage() {
                     type="text"
                     value={primaryColor}
                     onChange={handleColorChange}
-                    className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:outline-none focus:border-violet-500 text-sm text-gray-900 font-mono"
+                    className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:outline-none focus:border-violet-500 text-sm text-white font-mono"
                   />
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Office Address</label>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Office Address</label>
               <textarea
                 name="address"
                 rows={2}
                 value={branding.address}
                 onChange={handleBrandingChange}
-                className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:outline-none focus:border-violet-500 text-sm text-gray-900 resize-none"
+                className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:outline-none focus:border-violet-500 text-sm text-white resize-none"
               />
             </div>
 
@@ -366,7 +366,7 @@ export default function DashboardPage() {
               <button
                 type="submit"
                 disabled={savingBranding}
-                className="flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-700 text-gray-900 font-semibold text-sm rounded-xl transition-all shadow-md"
+                className="flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold text-sm rounded-xl transition-all shadow-md"
               >
                 {savingBranding ? (
                   <>Saving Config...</>

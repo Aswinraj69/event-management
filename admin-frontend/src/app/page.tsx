@@ -138,15 +138,15 @@ export default function SuperAdminPage() {
   // 1. LOGIN SCREEN
   if (!token) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center p-6 relative">
+      <div className="min-h-screen bg-[#09090b] flex flex-col justify-center items-center p-6 relative">
         <div className="absolute top-[20%] w-[350px] h-[350px] bg-violet-600/10 rounded-full blur-[100px] pointer-events-none" />
         
         <div className="w-full max-w-md glass-panel p-8 rounded-2xl shadow-xl shadow-black/50 z-10">
           <div className="flex flex-col items-center mb-8">
             <div className="p-3 bg-gradient-to-tr from-violet-600 to-indigo-600 rounded-xl shadow-lg mb-4">
-              <Camera className="w-6 h-6 text-gray-900" />
+              <Camera className="w-6 h-6 text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Super Admin Console</h2>
+            <h2 className="text-2xl font-bold text-white tracking-tight">Super Admin Console</h2>
             <p className="text-xs text-gray-500 mt-1">Simulate SaaS platform control operations</p>
           </div>
 
@@ -158,30 +158,30 @@ export default function SuperAdminPage() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Admin Email</label>
+              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Admin Email</label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:border-violet-500 focus:outline-none text-sm text-gray-900"
+                className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:border-violet-500 focus:outline-none text-sm text-white"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Password</label>
+              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Password</label>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:border-violet-500 focus:outline-none text-sm text-gray-900"
+                className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:border-violet-500 focus:outline-none text-sm text-white"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-gray-900 text-sm font-semibold rounded-xl hover:opacity-90 shadow-md disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm font-semibold rounded-xl hover:opacity-90 shadow-md disabled:opacity-50 transition-all flex items-center justify-center gap-2"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               Access Admin Platform
@@ -198,15 +198,15 @@ export default function SuperAdminPage() {
 
   // 2. ADMIN PORTAL SCREEN
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-[#09090b] flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#0f0f13] border-r border-gray-200 flex flex-col justify-between p-6">
+      <aside className="w-64 bg-[#0f0f13] border-r border-white/[0.05] flex flex-col justify-between p-6">
         <div>
           <div className="flex items-center gap-2 mb-8">
             <div className="p-1.5 bg-gradient-to-tr from-violet-600 to-indigo-600 rounded-md">
-              <Camera className="w-5 h-5 text-gray-900" />
+              <Camera className="w-5 h-5 text-white" />
             </div>
-            <span className="text-md font-bold tracking-tight text-gray-900">
+            <span className="text-md font-bold tracking-tight text-white">
               EVENTO ADMIN
             </span>
           </div>
@@ -215,7 +215,7 @@ export default function SuperAdminPage() {
             <button
               onClick={() => setActiveTab('pending')}
               className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all ${
-                activeTab === 'pending' ? 'bg-violet-600/10 text-violet-400 border-l-2 border-violet-500' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                activeTab === 'pending' ? 'bg-violet-600/10 text-violet-400 border-l-2 border-violet-500' : 'text-gray-400 hover:text-white hover:bg-white/[0.02]'
               }`}
             >
               <FileClock className="w-4 h-4" />
@@ -224,7 +224,7 @@ export default function SuperAdminPage() {
             <button
               onClick={() => setActiveTab('companies')}
               className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all ${
-                activeTab === 'companies' ? 'bg-violet-600/10 text-violet-400 border-l-2 border-violet-500' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                activeTab === 'companies' ? 'bg-violet-600/10 text-violet-400 border-l-2 border-violet-500' : 'text-gray-400 hover:text-white hover:bg-white/[0.02]'
               }`}
             >
               <Building2 className="w-4 h-4" />
@@ -235,7 +235,7 @@ export default function SuperAdminPage() {
 
         <button
           onClick={logout}
-          className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors text-sm font-medium mt-auto"
+          className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors text-sm font-medium mt-auto"
         >
           <LogOut className="w-4 h-4" /> Sign Out
         </button>
@@ -246,7 +246,7 @@ export default function SuperAdminPage() {
         <header className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight">Super Admin Dashboard</h1>
-            <p className="text-gray-500 text-sm mt-1">Review onboarding requests and configure active subscription limits.</p>
+            <p className="text-gray-400 text-sm mt-1">Review onboarding requests and configure active subscription limits.</p>
           </div>
         </header>
 
@@ -259,37 +259,37 @@ export default function SuperAdminPage() {
                   <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">Tenant Successfully Provisioned!</h3>
-                  <p className="text-xs text-gray-500">Database rows generated, trial subscription is active.</p>
+                  <h3 className="text-lg font-bold text-white">Tenant Successfully Provisioned!</h3>
+                  <p className="text-xs text-gray-400">Database rows generated, trial subscription is active.</p>
                 </div>
               </div>
               <button
                 onClick={() => setApprovedDetails(null)}
-                className="text-gray-500 hover:text-gray-900 text-xs"
+                className="text-gray-500 hover:text-white text-xs"
               >
                 Dismiss
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white/80 p-4 rounded-xl border border-gray-200 text-sm mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-black/40 p-4 rounded-xl border border-white/[0.05] text-sm mb-4">
               <div>
                 <p className="text-gray-500 text-xs">Provisioned Subdomain</p>
                 <p className="font-mono text-violet-400 mt-1">{approvedDetails.subdomain}.evento.com</p>
               </div>
               <div>
                 <p className="text-gray-500 text-xs">Login Email</p>
-                <p className="font-semibold text-gray-900 mt-1">{approvedDetails.adminEmail}</p>
+                <p className="font-semibold text-white mt-1">{approvedDetails.adminEmail}</p>
               </div>
               <div>
                 <p className="text-gray-500 text-xs">Temporary Password</p>
-                <p className="font-mono text-gray-900 mt-1 flex items-center gap-2">
+                <p className="font-mono text-white mt-1 flex items-center gap-2">
                   {approvedDetails.temporaryPassword}
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(approvedDetails.temporaryPassword);
                       alert('Password copied to clipboard!');
                     }}
-                    className="p-1 hover:bg-gray-200 rounded"
+                    className="p-1 hover:bg-white/10 rounded"
                   >
                     <ClipboardCopy className="w-3.5 h-3.5" />
                   </button>
@@ -299,7 +299,7 @@ export default function SuperAdminPage() {
             <Link
               href={`${process.env.NEXT_PUBLIC_TENANT_APP_URL || 'http://localhost:3000'}/login?subdomain=${approvedDetails.subdomain}`}
               target="_blank"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-gray-900 font-semibold text-xs rounded-lg shadow transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-xs rounded-lg shadow transition-all"
             >
               Simulate Login on `{approvedDetails.subdomain}`
             </Link>
@@ -311,7 +311,7 @@ export default function SuperAdminPage() {
           <div>
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
               Registration Requests{' '}
-              <span className="px-2 py-0.5 bg-gray-100 border border-white/[0.1] text-xs font-semibold rounded-md">
+              <span className="px-2 py-0.5 bg-white/[0.05] border border-white/[0.1] text-xs font-semibold rounded-md">
                 {registrations.filter(r => r.status === 'PENDING').length}
               </span>
             </h2>
@@ -319,7 +319,7 @@ export default function SuperAdminPage() {
             {registrations.filter(r => r.status === 'PENDING').length === 0 ? (
               <div className="glass-panel p-12 text-center rounded-2xl">
                 <FileClock className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-500 text-sm">No pending onboarding applications at this time.</p>
+                <p className="text-gray-400 text-sm">No pending onboarding applications at this time.</p>
 
               </div>
             ) : (
@@ -330,14 +330,14 @@ export default function SuperAdminPage() {
                     <div key={reg.id} className="glass-panel p-6 rounded-2xl flex flex-col md:flex-row justify-between md:items-center gap-6 animate-fade-in">
                       <div className="flex gap-4 items-center">
                         {reg.logoUrl ? (
-                          <img src={reg.logoUrl} alt="logo" className="w-12 h-12 rounded-xl object-cover border border-gray-200" />
+                          <img src={reg.logoUrl} alt="logo" className="w-12 h-12 rounded-xl object-cover border border-white/[0.05]" />
                         ) : (
                           <div className="w-12 h-12 rounded-xl bg-violet-600/10 border border-violet-500/20 flex items-center justify-center text-violet-400 font-bold">
                             {reg.companyName[0].toUpperCase()}
                           </div>
                         )}
                         <div>
-                          <h4 className="font-bold text-gray-900">{reg.companyName}</h4>
+                          <h4 className="font-bold text-white">{reg.companyName}</h4>
                           <p className="text-xs text-gray-500 mt-0.5">Owner: {reg.ownerName} &bull; {reg.email}</p>
                           <p className="text-xs text-gray-500 mt-1">Location: {reg.city}, {reg.country} &bull; {reg.employeeCount} Employees</p>
                         </div>
@@ -346,13 +346,13 @@ export default function SuperAdminPage() {
                       <div className="flex items-center gap-2 self-end md:self-auto">
                         <button
                           onClick={() => handleReject(reg.id)}
-                          className="px-4 py-2 text-xs font-semibold text-gray-500 hover:text-gray-900 bg-gray-50 border border-gray-300 hover:bg-gray-100 rounded-xl transition-all"
+                          className="px-4 py-2 text-xs font-semibold text-gray-400 hover:text-white bg-white/[0.02] border border-white/[0.08] hover:bg-white/[0.05] rounded-xl transition-all"
                         >
                           Reject
                         </button>
                         <button
                           onClick={() => handleApprove(reg.id)}
-                          className="flex items-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-gray-900 bg-violet-600 hover:bg-violet-700 rounded-xl transition-all shadow"
+                          className="flex items-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 rounded-xl transition-all shadow"
                         >
                           <Check className="w-3.5 h-3.5" /> Approve & Provision
                         </button>
@@ -369,19 +369,19 @@ export default function SuperAdminPage() {
             {companies.length === 0 ? (
               <div className="glass-panel p-12 text-center rounded-2xl">
                 <Building2 className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-500 text-sm">No company subdomains provisioned yet.</p>
+                <p className="text-gray-400 text-sm">No company subdomains provisioned yet.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {companies.map((comp) => (
-                  <div key={comp.id} className="glass-panel p-6 rounded-2xl flex flex-col justify-between border border-gray-200">
+                  <div key={comp.id} className="glass-panel p-6 rounded-2xl flex flex-col justify-between border border-white/[0.05]">
                     <div className="flex justify-between items-start mb-6">
                       <div className="flex gap-3 items-center">
                         <div className="w-10 h-10 bg-violet-600/10 rounded-lg flex items-center justify-center font-bold text-violet-400">
                           {comp.name[0]}
                         </div>
                         <div>
-                          <h4 className="font-bold text-gray-900">{comp.name}</h4>
+                          <h4 className="font-bold text-white">{comp.name}</h4>
                           <span className="text-xs font-mono text-violet-400">{comp.subdomain}.evento.com</span>
                         </div>
                       </div>
@@ -392,18 +392,18 @@ export default function SuperAdminPage() {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2 py-3 border-y border-gray-200 text-xs mb-6 text-gray-500">
+                    <div className="grid grid-cols-3 gap-2 py-3 border-y border-white/[0.04] text-xs mb-6 text-gray-400">
                       <div>
                         <p className="text-[10px] text-gray-500">Subscription Plan</p>
-                        <p className="font-semibold text-gray-900 mt-0.5">{comp.plan?.name || 'Starter'}</p>
+                        <p className="font-semibold text-white mt-0.5">{comp.plan?.name || 'Starter'}</p>
                       </div>
                       <div>
                         <p className="text-[10px] text-gray-500">Staff Count</p>
-                        <p className="font-semibold text-gray-900 mt-0.5">{comp._count.users}</p>
+                        <p className="font-semibold text-white mt-0.5">{comp._count.users}</p>
                       </div>
                       <div>
                         <p className="text-[10px] text-gray-500">Active Events</p>
-                        <p className="font-semibold text-gray-900 mt-0.5">{comp._count.events}</p>
+                        <p className="font-semibold text-white mt-0.5">{comp._count.events}</p>
                       </div>
                     </div>
 

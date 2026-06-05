@@ -199,13 +199,13 @@ export default function EventsPage() {
     <div className="space-y-8 animate-fade-in relative">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">Events Scheduler</h1>
-          <p className="text-gray-500 text-sm mt-1">Configure weddings, corporate campaigns, and dispatch staff.</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-white">Events Scheduler</h1>
+          <p className="text-gray-400 text-sm mt-1">Configure weddings, corporate campaigns, and dispatch staff.</p>
         </div>
         {isAdmin && (
           <button
             onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-gray-900 font-semibold text-xs rounded-xl shadow-lg transition-all"
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold text-xs rounded-xl shadow-lg transition-all"
           >
             <Calendar className="w-4 h-4" /> Book Event Campaign
           </button>
@@ -240,10 +240,10 @@ export default function EventsPage() {
                       </div>
                     )}
                     <span className="text-[10px] text-violet-400 font-bold tracking-widest uppercase">{event.type}</span>
-                    <h3 className="text-md font-bold text-gray-900 mt-1.5 truncate">{event.title}</h3>
+                    <h3 className="text-md font-bold text-white mt-1.5 truncate">{event.title}</h3>
                     <p className="text-xs text-gray-500 mt-1">{event.client?.name}</p>
 
-                    <div className="mt-4 pt-4 border-t border-gray-200 space-y-2 text-xs text-gray-500">
+                    <div className="mt-4 pt-4 border-t border-white/[0.04] space-y-2 text-xs text-gray-400">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-3.5 h-3.5 text-gray-500" />
                         <span>{new Date(event.eventDate).toISOString().split('T')[0]}</span>
@@ -273,19 +273,19 @@ export default function EventsPage() {
                   <span className="text-[9px] font-bold bg-violet-600/10 border border-violet-500/20 text-violet-400 px-2 py-0.5 rounded-md uppercase">
                     {selectedEvent.type}
                   </span>
-                  <h3 className="font-bold text-gray-900 text-md mt-2 leading-tight">{selectedEvent.title}</h3>
+                  <h3 className="font-bold text-white text-md mt-2 leading-tight">{selectedEvent.title}</h3>
                 </div>
-                <button onClick={() => setSelectedEvent(null)} className="text-gray-500 hover:text-gray-900">
+                <button onClick={() => setSelectedEvent(null)} className="text-gray-500 hover:text-white">
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Roster Assignment panel - Admin Mode */}
               {isAdmin ? (
-                <div className="space-y-4 border-t border-gray-200 pt-4 text-xs">
+                <div className="space-y-4 border-t border-white/[0.05] pt-4 text-xs">
                   <div className="flex justify-between items-center">
                     <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider"> Roster Allocation</h4>
-                    <span className="text-[9px] text-gray-500">Double booking guarded</span>
+                    <span className="text-[9px] text-gray-400">Double booking guarded</span>
                   </div>
 
                   {assignmentError && (
@@ -301,9 +301,9 @@ export default function EventsPage() {
                       const fullStaffRecord = selectedEvent.staffAssignments.find((a: any) => a.role === role);
 
                       return (
-                        <div key={role} className="flex flex-col gap-1.5 bg-black/20 p-2.5 rounded-xl border border-gray-100">
+                        <div key={role} className="flex flex-col gap-1.5 bg-black/20 p-2.5 rounded-xl border border-white/[0.03]">
                           <div className="flex justify-between items-center">
-                            <span className="font-bold text-gray-500 text-[10px]">{role}</span>
+                            <span className="font-bold text-gray-400 text-[10px]">{role}</span>
                             {fullStaffRecord && (
                               <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${
                                 fullStaffRecord.status === 'ACCEPTED' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
@@ -315,7 +315,7 @@ export default function EventsPage() {
                           <select
                             value={currentAssignee?.userId || ''}
                             onChange={e => handleRoleSelection(role, e.target.value)}
-                            className="w-full bg-white/80 border border-gray-300 text-xs text-gray-600 rounded-lg py-1 px-2 focus:outline-none"
+                            className="w-full bg-black/40 border border-white/[0.08] text-xs text-gray-300 rounded-lg py-1 px-2 focus:outline-none"
                           >
                             <option value="">Unassigned</option>
                             {employees.map(emp => (
@@ -331,20 +331,20 @@ export default function EventsPage() {
 
                   <button
                     onClick={handleSaveRoster}
-                    className="w-full py-2.5 bg-violet-600 hover:bg-violet-700 text-gray-900 font-semibold rounded-xl text-xs shadow transition-all flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl text-xs shadow transition-all flex items-center justify-center gap-1.5"
                   >
                     <UserPlus className="w-4 h-4" /> Save & Notify Crew
                   </button>
                 </div>
               ) : (
                 /* Staff member viewing panel */
-                <div className="space-y-4 border-t border-gray-200 pt-4 text-xs">
+                <div className="space-y-4 border-t border-white/[0.05] pt-4 text-xs">
                   <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Crew assignments</h4>
                   <div className="space-y-2">
                     {selectedEvent.staffAssignments.map((a: any) => (
-                      <div key={a.id} className="flex justify-between items-center bg-black/20 p-3 border border-gray-200 rounded-xl">
+                      <div key={a.id} className="flex justify-between items-center bg-black/20 p-3 border border-white/[0.04] rounded-xl">
                         <div>
-                          <p className="font-semibold text-gray-900">{a.user.firstName} {a.user.lastName}</p>
+                          <p className="font-semibold text-white">{a.user.firstName} {a.user.lastName}</p>
                           <span className="text-[10px] text-gray-500">{a.role}</span>
                         </div>
                         <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${
@@ -361,7 +361,7 @@ export default function EventsPage() {
                     const myAssign = selectedEvent.staffAssignments.find((a: any) => a.user.id === user?.userId);
                     if (myAssign && myAssign.status === 'PENDING') {
                       return (
-                        <div className="pt-4 border-t border-gray-200 space-y-2">
+                        <div className="pt-4 border-t border-white/[0.05] space-y-2">
                           <p className="text-[10px] font-bold text-violet-400 flex items-center gap-1">
                             <AlertCircle className="w-3.5 h-3.5" /> Action Required: Confirm Availability
                           </p>
@@ -389,25 +389,25 @@ export default function EventsPage() {
 
               {/* Financial cards parameters for administrators */}
               {isAdmin && (
-                <div className="space-y-3 border-t border-gray-200 pt-4 text-xs">
+                <div className="space-y-3 border-t border-white/[0.05] pt-4 text-xs">
                   <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
                     <Clipboard className="w-3.5 h-3.5" /> Project Budget ledger
                   </h4>
-                  <div className="bg-black/30 p-3 rounded-xl border border-gray-200 space-y-2">
+                  <div className="bg-black/30 p-3 rounded-xl border border-white/[0.04] space-y-2">
                     <div className="flex justify-between">
                       <span className="text-gray-500">Quotation value</span>
-                      <span className="text-gray-900 font-medium">AED {Number(selectedEvent.quotationAmount).toLocaleString()}</span>
+                      <span className="text-white font-medium">AED {Number(selectedEvent.quotationAmount).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-500">Advance Deposit</span>
-                      <span className="text-gray-900 font-medium">AED {Number(selectedEvent.advanceAmount).toLocaleString()}</span>
+                      <span className="text-white font-medium">AED {Number(selectedEvent.advanceAmount).toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between border-t border-gray-200 pt-2">
+                    <div className="flex justify-between border-t border-white/[0.04] pt-2">
                       <span className="text-gray-500">Additional Expenses</span>
-                      <span className="text-gray-900 font-medium">AED {Number(selectedEvent.additionalExpenses).toLocaleString()}</span>
+                      <span className="text-white font-medium">AED {Number(selectedEvent.additionalExpenses).toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between border-t border-gray-200 pt-2 font-bold">
-                      <span className="text-gray-500">Net Estimated Profit</span>
+                    <div className="flex justify-between border-t border-white/[0.05] pt-2 font-bold">
+                      <span className="text-gray-400">Net Estimated Profit</span>
                       <span className="text-emerald-400">AED {Number(selectedEvent.profit).toLocaleString()}</span>
                     </div>
                   </div>
@@ -424,9 +424,9 @@ export default function EventsPage() {
 
       {/* Book Event Dialog Form */}
       {showAddForm && (
-        <div className="fixed inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center p-6 z-50 animate-fade-in">
-          <div className="bg-[#0f0f13] border border-gray-300 rounded-2xl max-w-2xl w-full p-8 max-h-[85vh] overflow-y-auto shadow-2xl relative">
-            <button onClick={() => setShowAddForm(false)} className="absolute right-6 top-6 text-gray-500 hover:text-gray-900">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50 animate-fade-in">
+          <div className="bg-[#0f0f13] border border-white/[0.08] rounded-2xl max-w-2xl w-full p-8 max-h-[85vh] overflow-y-auto shadow-2xl relative">
+            <button onClick={() => setShowAddForm(false)} className="absolute right-6 top-6 text-gray-500 hover:text-white">
               <X className="w-5 h-5" />
             </button>
             <div className="mb-6">
@@ -437,12 +437,12 @@ export default function EventsPage() {
             <form onSubmit={handleCreateEvent} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Event Title</label>
-                  <input type="text" name="title" required value={formData.title} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-900" />
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Event Title</label>
+                  <input type="text" name="title" required value={formData.title} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Event Type</label>
-                  <select name="type" value={formData.type} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-500">
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Event Type</label>
+                  <select name="type" value={formData.type} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400">
                     <option value="WEDDING">Wedding</option>
                     <option value="ENGAGEMENT">Engagement</option>
                     <option value="BIRTHDAY">Birthday</option>
@@ -456,8 +456,8 @@ export default function EventsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Link Client Account</label>
-                  <select name="clientId" required value={formData.clientId} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-500">
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Link Client Account</label>
+                  <select name="clientId" required value={formData.clientId} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400">
                     <option value="">Choose Client</option>
                     {clients.map(c => (
                       <option key={c.id} value={c.id}>{c.name}</option>
@@ -465,58 +465,58 @@ export default function EventsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Event Date</label>
-                  <input type="date" name="eventDate" required value={formData.eventDate} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-500" />
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Event Date</label>
+                  <input type="date" name="eventDate" required value={formData.eventDate} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Start Time</label>
-                  <input type="text" name="startTime" placeholder="14:00" required value={formData.startTime} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-900" />
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Start Time</label>
+                  <input type="text" name="startTime" placeholder="14:00" required value={formData.startTime} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">End Time</label>
-                  <input type="text" name="endTime" placeholder="22:00" required value={formData.endTime} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-900" />
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">End Time</label>
+                  <input type="text" name="endTime" placeholder="22:00" required value={formData.endTime} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Venue Location</label>
-                  <input type="text" name="venue" placeholder="e.g. Armani Hotel" required value={formData.venue} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-900" />
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Venue Location</label>
+                  <input type="text" name="venue" placeholder="e.g. Armani Hotel" required value={formData.venue} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Google Maps URL (Optional)</label>
-                  <input type="text" name="googleMapsUrl" placeholder="https://..." value={formData.googleMapsUrl} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-900" />
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Google Maps URL (Optional)</label>
+                  <input type="text" name="googleMapsUrl" placeholder="https://..." value={formData.googleMapsUrl} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 border-t border-gray-200 pt-4">
+              <div className="grid grid-cols-3 gap-4 border-t border-white/[0.04] pt-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Quotation Amount (AED)</label>
-                  <input type="number" name="quotationAmount" value={formData.quotationAmount} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-900" />
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Quotation Amount (AED)</label>
+                  <input type="number" name="quotationAmount" value={formData.quotationAmount} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Advance Received (AED)</label>
-                  <input type="number" name="advanceAmount" value={formData.advanceAmount} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-900" />
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Advance Received (AED)</label>
+                  <input type="number" name="advanceAmount" value={formData.advanceAmount} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Est Additional Expenses</label>
-                  <input type="number" name="additionalExpenses" value={formData.additionalExpenses} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-900" />
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Est Additional Expenses</label>
+                  <input type="number" name="additionalExpenses" value={formData.additionalExpenses} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Event Planner Notes</label>
-                <textarea name="notes" rows={2} value={formData.notes} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-900 resize-none" />
+                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Event Planner Notes</label>
+                <textarea name="notes" rows={2} value={formData.notes} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white resize-none" />
               </div>
 
-              <div className="pt-4 border-t border-gray-200 flex justify-end gap-3">
-                <button type="button" onClick={() => setShowAddForm(false)} className="px-4 py-2 border border-gray-300 text-xs font-semibold rounded-xl text-gray-500 hover:text-gray-900">
+              <div className="pt-4 border-t border-white/[0.04] flex justify-end gap-3">
+                <button type="button" onClick={() => setShowAddForm(false)} className="px-4 py-2 border border-white/[0.08] text-xs font-semibold rounded-xl text-gray-400 hover:text-white">
                   Cancel
                 </button>
-                <button type="submit" className="px-6 py-2 bg-violet-600 hover:bg-violet-700 text-gray-900 font-semibold text-xs rounded-xl shadow-lg">
+                <button type="submit" className="px-6 py-2 bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs rounded-xl shadow-lg">
                   Schedule Event
                 </button>
               </div>

@@ -139,12 +139,12 @@ export default function QuotationsPage() {
     <div className="space-y-8 animate-fade-in relative">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">Quotations Builder</h1>
-          <p className="text-gray-500 text-sm mt-1">Compose professional estimations, customize line items, and share drafts.</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-white">Quotations Builder</h1>
+          <p className="text-gray-400 text-sm mt-1">Compose professional estimations, customize line items, and share drafts.</p>
         </div>
         <button
           onClick={() => setShowAddForm(true)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-gray-900 font-semibold text-xs rounded-xl shadow-lg transition-all"
+          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold text-xs rounded-xl shadow-lg transition-all"
         >
           <Plus className="w-4 h-4" /> Create Quotation
         </button>
@@ -162,11 +162,11 @@ export default function QuotationsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-gray-200 bg-white">
-                    <th className="p-4 font-bold text-gray-500">Quote Number</th>
-                    <th className="p-4 font-bold text-gray-500">Client / Event</th>
-                    <th className="p-4 font-bold text-gray-500">Total Estimation</th>
-                    <th className="p-4 font-bold text-gray-500">Status</th>
+                  <tr className="border-b border-white/[0.05] bg-white/[0.01]">
+                    <th className="p-4 font-bold text-gray-400">Quote Number</th>
+                    <th className="p-4 font-bold text-gray-400">Client / Event</th>
+                    <th className="p-4 font-bold text-gray-400">Total Estimation</th>
+                    <th className="p-4 font-bold text-gray-400">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -174,22 +174,22 @@ export default function QuotationsPage() {
                     <tr
                       key={q.id}
                       onClick={() => setSelectedQuo(q)}
-                      className={`border-b border-gray-100 hover:bg-white cursor-pointer transition-colors ${
-                        selectedQuo?.id === q.id ? 'bg-gray-50' : ''
+                      className={`border-b border-white/[0.03] hover:bg-white/[0.01] cursor-pointer transition-colors ${
+                        selectedQuo?.id === q.id ? 'bg-white/[0.02]' : ''
                       }`}
                     >
                       <td className="p-4 font-mono font-bold text-violet-400">{q.quotationNumber}</td>
                       <td className="p-4">
-                        <p className="font-semibold text-gray-900">{q.client?.name}</p>
+                        <p className="font-semibold text-white">{q.client?.name}</p>
                         <span className="text-[10px] text-gray-500 block mt-0.5">{q.event?.title || 'Standalone Request'}</span>
                       </td>
-                      <td className="p-4 font-medium text-gray-600">
+                      <td className="p-4 font-medium text-gray-300">
                         AED {computeQuoTotal(q.services).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </td>
                       <td className="p-4">
                         <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold ${
                           q.status === 'ACCEPTED' ? 'bg-emerald-500/10 text-emerald-400' :
-                          q.status === 'SENT' ? 'bg-indigo-500/10 text-indigo-400' : 'bg-gray-500/10 text-gray-500'
+                          q.status === 'SENT' ? 'bg-indigo-500/10 text-indigo-400' : 'bg-gray-500/10 text-gray-400'
                         }`}>
                           {q.status}
                         </span>
@@ -206,34 +206,34 @@ export default function QuotationsPage() {
         <div>
           {selectedQuo ? (
             <div className="glass-panel p-6 rounded-2xl space-y-6 animate-fade-in text-xs relative">
-              <div className="flex justify-between items-center border-b border-gray-200 pb-4">
+              <div className="flex justify-between items-center border-b border-white/[0.05] pb-4">
                 <div>
-                  <h3 className="font-bold text-gray-900 text-md">Document Preview</h3>
+                  <h3 className="font-bold text-white text-md">Document Preview</h3>
                   <p className="text-[10px] text-gray-500 mt-0.5">Branded layout template</p>
                 </div>
-                <button onClick={() => { setSelectedQuo(null); setSharingMethod(''); }} className="text-gray-500 hover:text-gray-900">
+                <button onClick={() => { setSelectedQuo(null); setSharingMethod(''); }} className="text-gray-500 hover:text-white">
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               {/* SIMULATED EXPORT PDF WITH TENANT LOGO & COLORS */}
               <div className="bg-[#0f0f13] border border-white/[0.06] rounded-xl p-5 space-y-4 shadow-inner">
-                <div className="flex justify-between items-start border-b border-gray-100 pb-3">
+                <div className="flex justify-between items-start border-b border-white/[0.03] pb-3">
                   <div>
                     {selectedQuo.company?.logoUrl ? (
-                      <img src={selectedQuo.company.logoUrl} alt="Logo" className="w-10 h-10 object-cover rounded-lg border border-gray-200 mb-2" />
+                      <img src={selectedQuo.company.logoUrl} alt="Logo" className="w-10 h-10 object-cover rounded-lg border border-white/[0.05] mb-2" />
                     ) : (
-                      <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center font-bold text-gray-900 mb-2">
+                      <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center font-bold text-white mb-2">
                         {selectedQuo.company?.name[0]}
                       </div>
                     )}
-                    <h4 className="font-bold text-gray-900 text-[11px]">{selectedQuo.company?.name}</h4>
+                    <h4 className="font-bold text-white text-[11px]">{selectedQuo.company?.name}</h4>
                     <p className="text-[9px] text-gray-500 leading-tight mt-1">{selectedQuo.company?.address || 'Office Address'}</p>
                     <p className="text-[9px] text-gray-500 font-mono mt-0.5">VAT: {selectedQuo.company?.vatNumber || 'N/A'}</p>
                   </div>
                   <div className="text-right">
                     <span className="text-[9px] font-bold bg-violet-600/20 text-violet-400 border border-violet-500/30 px-1.5 py-0.5 rounded uppercase">Quotation</span>
-                    <p className="font-mono font-bold text-gray-900 text-[10px] mt-2">{selectedQuo.quotationNumber}</p>
+                    <p className="font-mono font-bold text-white text-[10px] mt-2">{selectedQuo.quotationNumber}</p>
                     <p className="text-[9px] text-gray-500 mt-1">{new Date(selectedQuo.createdAt).toISOString().split('T')[0]}</p>
                   </div>
                 </div>
@@ -241,38 +241,38 @@ export default function QuotationsPage() {
                 {/* Client properties */}
                 <div>
                   <p className="text-[9px] text-gray-500 font-semibold uppercase">Estimating For:</p>
-                  <p className="font-bold text-gray-900 mt-1">{selectedQuo.client?.name}</p>
-                  <p className="text-gray-500 mt-0.5">{selectedQuo.client?.email} &bull; {selectedQuo.client?.phone}</p>
+                  <p className="font-bold text-white mt-1">{selectedQuo.client?.name}</p>
+                  <p className="text-gray-400 mt-0.5">{selectedQuo.client?.email} &bull; {selectedQuo.client?.phone}</p>
                 </div>
 
                 {/* Itemized Services Table */}
-                <div className="border-t border-gray-100 pt-3">
-                  <div className="grid grid-cols-3 font-bold text-[9px] text-gray-500 uppercase pb-1 border-b border-gray-100">
+                <div className="border-t border-white/[0.03] pt-3">
+                  <div className="grid grid-cols-3 font-bold text-[9px] text-gray-500 uppercase pb-1 border-b border-white/[0.03]">
                     <span>Description</span>
                     <span className="text-center">Qty x Unit</span>
                     <span className="text-right">Total</span>
                   </div>
                   <div className="divide-y divide-white/[0.03] max-h-36 overflow-y-auto">
                     {selectedQuo.services.map((s: any, i: number) => (
-                      <div key={i} className="grid grid-cols-3 py-2 text-[10px] text-gray-600">
+                      <div key={i} className="grid grid-cols-3 py-2 text-[10px] text-gray-300">
                         <span className="truncate pr-2">{s.description}</span>
                         <span className="text-center text-gray-500">{s.quantity} x {s.unitPrice}</span>
-                        <span className="text-right text-gray-900 font-medium">AED {Number(s.totalPrice).toLocaleString()}</span>
+                        <span className="text-right text-white font-medium">AED {Number(s.totalPrice).toLocaleString()}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Grand total values */}
-                <div className="border-t border-gray-200 pt-3 flex justify-between font-bold text-[11px]">
-                  <span className="text-gray-500">Total Valuation</span>
-                  <span className="text-gray-900">AED {computeQuoTotal(selectedQuo.services).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                <div className="border-t border-white/[0.05] pt-3 flex justify-between font-bold text-[11px]">
+                  <span className="text-gray-400">Total Valuation</span>
+                  <span className="text-white">AED {computeQuoTotal(selectedQuo.services).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                 </div>
 
                 {/* Terms conditions text box */}
                 {selectedQuo.termsConditions && (
-                  <div className="border-t border-gray-100 pt-2 text-[9px] text-gray-500 leading-normal">
-                    <span className="font-semibold text-gray-500 block mb-0.5">Terms:</span>
+                  <div className="border-t border-white/[0.03] pt-2 text-[9px] text-gray-500 leading-normal">
+                    <span className="font-semibold text-gray-400 block mb-0.5">Terms:</span>
                     {selectedQuo.termsConditions}
                   </div>
                 )}
@@ -294,13 +294,13 @@ export default function QuotationsPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => { handleUpdateStatus(selectedQuo.id, 'SENT'); setSharingMethod('email'); }}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-gray-900 font-semibold rounded-xl"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl"
                   >
                     <Mail className="w-3.5 h-3.5" /> Share Email
                   </button>
                   <button
                     onClick={() => { handleUpdateStatus(selectedQuo.id, 'SENT'); setSharingMethod('whatsapp'); }}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-gray-900 font-semibold rounded-xl"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl"
                   >
                     <Share2 className="w-3.5 h-3.5" /> Share WhatsApp
                   </button>
@@ -308,7 +308,7 @@ export default function QuotationsPage() {
                 
                 <button
                   onClick={handleCopyMagicLink}
-                  className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-900 font-semibold rounded-xl transition-all"
+                  className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.05] text-white font-semibold rounded-xl transition-all"
                 >
                   <LinkIcon className="w-3.5 h-3.5" /> Copy Client Magic Link
                 </button>
@@ -325,10 +325,10 @@ export default function QuotationsPage() {
 
                 {/* Approve accept action simulation */}
                 {selectedQuo.status !== 'ACCEPTED' && (
-                  <div className="pt-2 border-t border-gray-200">
+                  <div className="pt-2 border-t border-white/[0.05]">
                     <button
                       onClick={() => handleUpdateStatus(selectedQuo.id, 'ACCEPTED')}
-                      className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-gray-900 font-semibold rounded-xl"
+                      className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl"
                     >
                       <Check className="w-4 h-4" /> Client Accept Quotation
                     </button>
@@ -346,9 +346,9 @@ export default function QuotationsPage() {
 
       {/* Add Quotation Dialog Form */}
       {showAddForm && (
-        <div className="fixed inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center p-6 z-50 animate-fade-in">
-          <div className="bg-[#0f0f13] border border-gray-300 rounded-2xl max-w-2xl w-full p-8 max-h-[85vh] overflow-y-auto shadow-2xl relative">
-            <button onClick={() => setShowAddForm(false)} className="absolute right-6 top-6 text-gray-500 hover:text-gray-900">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50 animate-fade-in">
+          <div className="bg-[#0f0f13] border border-white/[0.08] rounded-2xl max-w-2xl w-full p-8 max-h-[85vh] overflow-y-auto shadow-2xl relative">
+            <button onClick={() => setShowAddForm(false)} className="absolute right-6 top-6 text-gray-500 hover:text-white">
               <X className="w-5 h-5" />
             </button>
             <div className="mb-6">
@@ -359,8 +359,8 @@ export default function QuotationsPage() {
             <form onSubmit={handleCreateQuo} className="space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Link Client Card</label>
-                  <select required value={clientId} onChange={e => setClientId(e.target.value)} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-500 focus:outline-none">
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Link Client Card</label>
+                  <select required value={clientId} onChange={e => setClientId(e.target.value)} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400 focus:outline-none">
                     <option value="">Choose Client</option>
                     {clients.map(c => (
                       <option key={c.id} value={c.id}>{c.name}</option>
@@ -368,8 +368,8 @@ export default function QuotationsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Link Scheduled Event (Optional)</label>
-                  <select value={eventId} onChange={e => setEventId(e.target.value)} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-500 focus:outline-none">
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Link Scheduled Event (Optional)</label>
+                  <select value={eventId} onChange={e => setEventId(e.target.value)} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400 focus:outline-none">
                     <option value="">No Linked Event</option>
                     {events.map(e => (
                       <option key={e.id} value={e.id}>{e.title}</option>
@@ -381,14 +381,14 @@ export default function QuotationsPage() {
               {/* Service Line Items */}
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase">Estimates Itemized Line Items</label>
-                  <button type="button" onClick={handleAddServiceRow} className="text-[10px] font-bold text-violet-400 hover:text-gray-900">
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase">Estimates Itemized Line Items</label>
+                  <button type="button" onClick={handleAddServiceRow} className="text-[10px] font-bold text-violet-400 hover:text-white">
                     + Add Row
                   </button>
                 </div>
                 <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
                   {services.map((item, index) => (
-                    <div key={index} className="flex gap-3 items-center bg-black/20 p-3 border border-gray-100 rounded-xl">
+                    <div key={index} className="flex gap-3 items-center bg-black/20 p-3 border border-white/[0.03] rounded-xl">
                       <div className="flex-1">
                         <input
                           type="text"
@@ -396,7 +396,7 @@ export default function QuotationsPage() {
                           placeholder="e.g. Photography Session"
                           value={item.description}
                           onChange={e => handleServiceChange(index, 'description', e.target.value)}
-                          className="w-full bg-transparent border-b border-gray-300 text-xs text-gray-900 pb-1 focus:outline-none focus:border-violet-500"
+                          className="w-full bg-transparent border-b border-white/[0.08] text-xs text-white pb-1 focus:outline-none focus:border-violet-500"
                         />
                       </div>
                       <div className="w-16">
@@ -406,7 +406,7 @@ export default function QuotationsPage() {
                           required
                           value={item.quantity}
                           onChange={e => handleServiceChange(index, 'quantity', e.target.value)}
-                          className="w-full bg-transparent border-b border-gray-300 text-xs text-center text-gray-900 pb-1 focus:outline-none focus:border-violet-500"
+                          className="w-full bg-transparent border-b border-white/[0.08] text-xs text-center text-white pb-1 focus:outline-none focus:border-violet-500"
                         />
                       </div>
                       <div className="w-24">
@@ -416,7 +416,7 @@ export default function QuotationsPage() {
                           required
                           value={item.unitPrice}
                           onChange={e => handleServiceChange(index, 'unitPrice', e.target.value)}
-                          className="w-full bg-transparent border-b border-gray-300 text-xs text-right text-gray-900 pb-1 focus:outline-none focus:border-violet-500 font-mono"
+                          className="w-full bg-transparent border-b border-white/[0.08] text-xs text-right text-white pb-1 focus:outline-none focus:border-violet-500 font-mono"
                         />
                       </div>
                       <button type="button" onClick={() => handleRemoveServiceRow(index)} className="text-gray-500 hover:text-red-400 p-1">
@@ -428,20 +428,20 @@ export default function QuotationsPage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Terms and Conditions</label>
-                <textarea rows={2} value={terms} onChange={e => setTerms(e.target.value)} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-900 resize-none" />
+                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Terms and Conditions</label>
+                <textarea rows={2} value={terms} onChange={e => setTerms(e.target.value)} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white resize-none" />
               </div>
 
-              <div className="pt-4 border-t border-gray-200 flex justify-between items-center text-xs">
+              <div className="pt-4 border-t border-white/[0.04] flex justify-between items-center text-xs">
                 <div>
                   <span className="text-gray-500 font-bold uppercase block">Grand Total Valuation</span>
-                  <span className="text-gray-900 font-extrabold text-sm mt-0.5">AED {computeQuoTotal(services).toLocaleString()}</span>
+                  <span className="text-white font-extrabold text-sm mt-0.5">AED {computeQuoTotal(services).toLocaleString()}</span>
                 </div>
                 <div className="flex gap-3">
-                  <button type="button" onClick={() => setShowAddForm(false)} className="px-4 py-2 border border-gray-300 font-semibold text-gray-500 hover:text-gray-900 rounded-xl">
+                  <button type="button" onClick={() => setShowAddForm(false)} className="px-4 py-2 border border-white/[0.08] font-semibold text-gray-400 hover:text-white rounded-xl">
                     Cancel
                   </button>
-                  <button type="submit" className="px-6 py-2 bg-violet-600 hover:bg-violet-700 text-gray-900 font-semibold rounded-xl shadow-lg">
+                  <button type="submit" className="px-6 py-2 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl shadow-lg">
                     Build Quotation
                   </button>
                 </div>

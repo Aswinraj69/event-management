@@ -1,45 +1,50 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, Environment, ContactShadows, PresentationControls, Sphere, MeshDistortMaterial } from '@react-three/drei';
+import { Float, Environment, ContactShadows, PresentationControls, Icosahedron } from '@react-three/drei';
 import * as THREE from 'three';
 
-function AnimatedSphere() {
-  const sphereRef = useRef<THREE.Mesh>(null);
+function AnimatedGeometry() {
+  const meshRef = useRef<THREE.Mesh>(null);
 
-  // Rotate slowly over time
   useFrame((state) => {
-    if (sphereRef.current) {
-      sphereRef.current.rotation.x = state.clock.elapsedTime * 0.2;
-      sphereRef.current.rotation.y = state.clock.elapsedTime * 0.3;
+    if (meshRef.current) {
+      meshRef.current.rotation.x = state.clock.elapsedTime * 0.2;
+      meshRef.current.rotation.y = state.clock.elapsedTime * 0.3;
     }
   });
 
   return (
-    <Float speed={2} rotationIntensity={1.5} floatIntensity={2}>
-      <Sphere ref={sphereRef} args={[1, 64, 64]} scale={1.5}>
-        <MeshDistortMaterial
-          color="#6d28d9"
-          attach="material"
-          distort={0.4}
-          speed={1.5}
-          roughness={0.1}
-          metalness={0.8}
-          clearcoat={1}
-          clearcoatRoughness={0.1}
+    <Float speed={2} rotationIntensity={2} floatIntensity={2}>
+      {/* Bright glowing core */}
+      <Icosahedron ref={meshRef} args={[1.5, 0]}>
+        <meshStandardMaterial 
+          color="#8b5cf6" 
+          wireframe={true} 
+          emissive="#8b5cf6" 
+          emissiveIntensity={2} 
         />
-      </Sphere>
+      </Icosahedron>
 
-      {/* Floating orbital rings around the sphere */}
-      <mesh rotation={[Math.PI / 2, 0, 0]} scale={2.5}>
+      {/* Solid inner core */}
+      <Icosahedron args={[1.4, 0]}>
+        <meshStandardMaterial 
+          color="#4c1d95" 
+          roughness={0.2}
+          metalness={0.8}
+        />
+      </Icosahedron>
+
+      {/* Floating orbital rings */}
+      <mesh rotation={[Math.PI / 2, 0, 0]} scale={3}>
         <torusGeometry args={[1, 0.02, 16, 100]} />
-        <meshStandardMaterial color="#4f46e5" emissive="#4f46e5" emissiveIntensity={0.5} />
+        <meshStandardMaterial color="#c4b5fd" emissive="#c4b5fd" emissiveIntensity={1} />
       </mesh>
       
-      <mesh rotation={[Math.PI / 4, Math.PI / 4, 0]} scale={3}>
-        <torusGeometry args={[1, 0.01, 16, 100]} />
-        <meshStandardMaterial color="#a78bfa" emissive="#a78bfa" emissiveIntensity={0.2} />
+      <mesh rotation={[Math.PI / 4, Math.PI / 4, 0]} scale={3.5}>
+        <torusGeometry args={[1, 0.02, 16, 100]} />
+        <meshStandardMaterial color="#a78bfa" emissive="#a78bfa" emissiveIntensity={1} />
       </mesh>
     </Float>
   );
@@ -47,14 +52,14 @@ function AnimatedSphere() {
 
 export default function Hero3D() {
   return (
-    <div className="absolute inset-0 w-full h-full -z-10 pointer-events-auto">
+    <div className="fixed inset-0 w-full h-full -z-10 bg-black pointer-events-auto">
       <Canvas
-        camera={{ position: [0, 0, 6], fov: 45 }}
-        gl={{ antialias: true, alpha: true }}
+        camera={{ position: [0, 0, 8], fov: 45 }}
+        gl={{ antialias: true, alpha: false }}
       >
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[10, 10, 5]} intensity={1} color="#ffffff" />
-        <directionalLight position={[-10, -10, -5]} intensity={0.5} color="#8b5cf6" />
+        <ambientLight intensity={1} />
+        <directionalLight position={[10, 10, 5]} intensity={2} color="#ffffff" />
+        <directionalLight position={[-10, -10, -5]} intensity={1} color="#c4b5fd" />
         
         <PresentationControls
           global
@@ -64,16 +69,16 @@ export default function Hero3D() {
           polar={[-Math.PI / 3, Math.PI / 3]}
           azimuth={[-Math.PI / 1.4, Math.PI / 2]}
         >
-          <AnimatedSphere />
+          <AnimatedGeometry />
         </PresentationControls>
 
         <ContactShadows
-          position={[0, -2.5, 0]}
-          opacity={0.4}
+          position={[0, -3, 0]}
+          opacity={0.7}
           scale={20}
-          blur={2}
+          blur={2.5}
           far={4.5}
-          color="#000000"
+          color="#8b5cf6"
         />
         
         <Environment preset="city" />

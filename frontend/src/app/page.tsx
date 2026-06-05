@@ -1,100 +1,112 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { Camera, Calendar, FileText, Shield, Sparkles, Building2, UserSquare2, ChevronRight } from 'lucide-react';
+import { Camera, Shield, FileText, Calendar, ChevronRight, Sparkles } from 'lucide-react';
+import { Suspense } from 'react';
+
+// Dynamically import the 3D scene to prevent SSR issues
+const Hero3D = dynamic(() => import('../components/Hero3D'), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 w-full h-full -z-10 bg-[#09090b] animate-pulse" />
+});
 
 export default function HomePage() {
   return (
-    <div className="relative overflow-hidden min-h-screen bg-[#09090b]">
-      {/* Background glow effects */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#6d28d9] rounded-full blur-[160px] opacity-10 pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#4f46e5] rounded-full blur-[160px] opacity-10 pointer-events-none" />
+    <div className="relative overflow-hidden min-h-screen bg-[#09090b] text-white selection:bg-violet-500/30">
+      {/* Dynamic 3D Background */}
+      <Hero3D />
 
       {/* Navigation Header */}
-      <header className="flex justify-between items-center px-8 py-6 max-w-7xl mx-auto border-b border-white/[0.05]">
+      <header className="absolute top-0 w-full z-50 flex justify-between items-center px-6 md:px-12 py-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-tr from-violet-600 to-indigo-600 rounded-lg shadow-lg">
+          <div className="p-2.5 bg-gradient-to-tr from-violet-600 to-indigo-600 rounded-xl shadow-lg shadow-violet-500/20 backdrop-blur-md">
             <Camera className="w-6 h-6 text-white" />
           </div>
-          <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+          <span className="text-2xl font-extrabold tracking-tighter bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent">
             EVENTO
           </span>
         </div>
-        <div className="flex items-center gap-4">
-          <Link href="/login" className="px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors">
+        <div className="flex items-center gap-6">
+          <Link href="/login" className="text-sm font-medium text-gray-300 hover:text-white transition-colors drop-shadow-md">
             Portal Login
           </Link>
-          <Link href="/register" className="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 rounded-lg hover:opacity-90 shadow-md shadow-violet-500/10 transition-all">
+          <Link href="/register" className="px-6 py-2.5 text-sm font-bold text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-xl rounded-full shadow-xl transition-all hover:scale-105 active:scale-95">
             Get Started
           </Link>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <main className="max-w-7xl mx-auto px-6 py-20 text-center animate-fade-in">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/[0.03] border border-white/[0.08] rounded-full text-xs text-violet-400 mb-8 font-medium">
-          <Sparkles className="w-3.5 h-3.5" /> Introducing EVENTO Multi-Tenant Core Platform
+      {/* Hero Content Overlay */}
+      <main className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 pt-20">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 backdrop-blur-md rounded-full text-xs font-semibold text-violet-300 mb-8 animate-fade-in drop-shadow-xl">
+          <Sparkles className="w-4 h-4 text-violet-400" /> Introducing EVENTO Multi-Tenant Platform
         </div>
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-4xl mx-auto leading-tight mb-8">
+        
+        <h1 className="text-5xl md:text-8xl font-black tracking-tighter max-w-5xl mx-auto leading-[1.1] mb-8 drop-shadow-2xl">
           The Operating System for{' '}
-          <span className="bg-gradient-to-r from-violet-400 via-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-violet-400 via-indigo-300 to-cyan-300 bg-clip-text text-transparent">
             Event Management
-          </span>{' '}
-          Companies.
+          </span>
         </h1>
-        <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
+        
+        <p className="text-lg md:text-2xl text-gray-300 max-w-3xl mx-auto mb-16 leading-relaxed font-medium drop-shadow-md">
           Manage photostudios, videographers, wedding planners, schedules, invoices, and roster assignments from a premium single-tenant interface.
         </p>
 
         {/* Call to Actions */}
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-24">
-          <Link href="/register" className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 rounded-xl hover:opacity-95 shadow-xl shadow-violet-500/15 transition-all">
-            Register Company <ChevronRight className="w-4 h-4" />
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-6 mb-24 w-full">
+          <Link href="/register" className="group flex items-center justify-center gap-2 px-10 py-5 w-full sm:w-auto font-bold text-lg text-white bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl hover:opacity-90 shadow-2xl shadow-violet-600/30 transition-all hover:scale-105">
+            Register Company <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
-
+          <Link href="/login" className="flex items-center justify-center gap-2 px-10 py-5 w-full sm:w-auto font-bold text-lg text-white bg-white/5 border border-white/10 hover:bg-white/10 backdrop-blur-xl rounded-2xl transition-all shadow-xl">
+            Access Portal
+          </Link>
         </div>
 
         {/* Feature Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto pb-32">
           {/* Card 1 */}
-          <div className="glass-panel glass-panel-hover p-8 rounded-2xl text-left">
-            <div className="w-12 h-12 flex items-center justify-center bg-violet-600/10 border border-violet-500/20 rounded-xl mb-6">
-              <Shield className="w-6 h-6 text-violet-400" />
+          <div className="bg-black/40 backdrop-blur-2xl border border-white/10 p-8 rounded-3xl text-left shadow-2xl hover:bg-black/60 transition-colors">
+            <div className="w-14 h-14 flex items-center justify-center bg-violet-500/20 border border-violet-500/30 rounded-2xl mb-6 shadow-inner shadow-violet-500/20">
+              <Shield className="w-7 h-7 text-violet-300" />
             </div>
-            <h3 className="text-xl font-bold mb-3">Multi-Tenant Isolation</h3>
-            <p className="text-gray-400 leading-relaxed text-sm">
+            <h3 className="text-xl font-bold mb-3 text-white">Multi-Tenant Isolation</h3>
+            <p className="text-gray-400 leading-relaxed text-sm font-medium">
               Each studio gets a dedicated secure subdomain, custom database queries, personalized branding configuration, logos, and dashboard configurations.
             </p>
           </div>
 
           {/* Card 2 */}
-          <div className="glass-panel glass-panel-hover p-8 rounded-2xl text-left">
-            <div className="w-12 h-12 flex items-center justify-center bg-indigo-600/10 border border-indigo-500/20 rounded-xl mb-6">
-              <Calendar className="w-6 h-6 text-indigo-400" />
+          <div className="bg-black/40 backdrop-blur-2xl border border-white/10 p-8 rounded-3xl text-left shadow-2xl hover:bg-black/60 transition-colors">
+            <div className="w-14 h-14 flex items-center justify-center bg-indigo-500/20 border border-indigo-500/30 rounded-2xl mb-6 shadow-inner shadow-indigo-500/20">
+              <Calendar className="w-7 h-7 text-indigo-300" />
             </div>
-            <h3 className="text-xl font-bold mb-3">Roster Conflict Prevention</h3>
-            <p className="text-gray-400 leading-relaxed text-sm">
+            <h3 className="text-xl font-bold mb-3 text-white">Roster Conflict Prevention</h3>
+            <p className="text-gray-400 leading-relaxed text-sm font-medium">
               Schedule staff to shoots and coordinates. Checks availability real-time and prevents double bookings to eliminate operational gaps.
             </p>
           </div>
 
           {/* Card 3 */}
-          <div className="glass-panel glass-panel-hover p-8 rounded-2xl text-left">
-            <div className="w-12 h-12 flex items-center justify-center bg-cyan-600/10 border border-cyan-500/20 rounded-xl mb-6">
-              <FileText className="w-6 h-6 text-cyan-400" />
+          <div className="bg-black/40 backdrop-blur-2xl border border-white/10 p-8 rounded-3xl text-left shadow-2xl hover:bg-black/60 transition-colors">
+            <div className="w-14 h-14 flex items-center justify-center bg-cyan-500/20 border border-cyan-500/30 rounded-2xl mb-6 shadow-inner shadow-cyan-500/20">
+              <FileText className="w-7 h-7 text-cyan-300" />
             </div>
-            <h3 className="text-xl font-bold mb-3">Sleek Invoicing & VAT</h3>
-            <p className="text-gray-400 leading-relaxed text-sm">
+            <h3 className="text-xl font-bold mb-3 text-white">Sleek Invoicing & VAT</h3>
+            <p className="text-gray-400 leading-relaxed text-sm font-medium">
               Generate quotation drafts and tax invoices automatically with QR verification codes. Track incoming advance deposits and outstanding balances dynamically.
             </p>
           </div>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="text-center py-10 border-t border-white/[0.05] text-xs text-gray-500 max-w-7xl mx-auto">
-        &copy; 2026 EVENTO Inc. All rights reserved. Designed for elite event companies globally.
-      </footer>
+      {/* Footer overlay */}
+      <div className="absolute bottom-6 w-full text-center z-50 pointer-events-none">
+        <p className="text-xs font-medium text-white/40 tracking-wider">
+          &copy; 2026 EVENTO INC. DESIGNED FOR ELITE EVENT COMPANIES GLOBALLY.
+        </p>
+      </div>
     </div>
   );
 }

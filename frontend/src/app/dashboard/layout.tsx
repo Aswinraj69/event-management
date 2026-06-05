@@ -52,7 +52,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#09090b] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-violet-500 animate-spin" />
       </div>
     );
@@ -76,35 +76,35 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div
-      className="min-h-screen bg-[#09090b] flex"
+      className="min-h-screen bg-gray-50 flex"
       style={{
         '--primary': brandPrimary,
       } as React.CSSProperties}
     >
       {/* Sidebar navigation */}
-      <aside className="w-64 bg-[#0f0f13] border-r border-white/[0.05] flex flex-col justify-between p-6 z-10 shrink-0">
+      <aside className="w-64 bg-[#0f0f13] border-r border-gray-200 flex flex-col justify-between p-6 z-10 shrink-0">
         <div>
           {/* Logo brand indicator */}
           <div className="flex items-center gap-3 mb-8">
             {branding?.logoUrl ? (
-              <img src={branding.logoUrl} alt="Logo" className="w-8 h-8 rounded-lg object-cover border border-white/[0.08]" />
+              <img src={branding.logoUrl} alt="Logo" className="w-8 h-8 rounded-lg object-cover border border-gray-300" />
             ) : (
-              <div className="p-1.5 rounded-md text-white" style={{ backgroundColor: brandPrimary }}>
+              <div className="p-1.5 rounded-md text-gray-900" style={{ backgroundColor: brandPrimary }}>
                 <Camera className="w-5 h-5" />
               </div>
             )}
-            <span className="text-md font-bold tracking-tight text-white leading-tight">
+            <span className="text-md font-bold tracking-tight text-gray-900 leading-tight">
               {brandName}
             </span>
           </div>
 
           {/* User profile identifier */}
-          <div className="mb-6 p-3 bg-white/[0.02] border border-white/[0.05] rounded-xl flex items-center gap-3">
+          <div className="mb-6 p-3 bg-gray-50 border border-gray-200 rounded-xl flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-violet-600/10 flex items-center justify-center font-bold text-[11px] text-violet-400">
               {user?.firstName[0]}{user?.lastName[0]}
             </div>
             <div className="overflow-hidden">
-              <p className="text-xs font-semibold text-white truncate">{user?.firstName} {user?.lastName}</p>
+              <p className="text-xs font-semibold text-gray-900 truncate">{user?.firstName} {user?.lastName}</p>
               <span className="text-[9px] text-gray-500 uppercase font-bold tracking-wider block mt-0.5">{user?.role.replace('_', ' ')}</span>
             </div>
           </div>
@@ -118,7 +118,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   key={item.path}
                   href={item.path}
                   className={`w-full flex items-center gap-3 px-4 py-3 text-xs font-medium rounded-xl transition-all ${
-                    active ? 'bg-white/[0.03] text-white border-l-2 border-solid' : 'text-gray-400 hover:text-white hover:bg-white/[0.01]'
+                    active ? 'bg-gray-100 text-gray-900 border-l-2 border-solid' : 'text-gray-500 hover:text-gray-900 hover:bg-white'
                   }`}
                   style={{ borderLeftColor: active ? brandPrimary : 'transparent' }}
                 >
@@ -132,7 +132,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors text-xs font-medium mt-auto pt-6 border-t border-white/[0.05]"
+          className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors text-xs font-medium mt-auto pt-6 border-t border-gray-200"
         >
           <LogOut className="w-4 h-4" /> Sign Out
         </button>

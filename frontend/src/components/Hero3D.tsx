@@ -52,7 +52,7 @@ function AnimatedGeometry() {
 
 export default function Hero3D() {
   return (
-    <div className="fixed inset-0 w-full h-full -z-10 bg-black pointer-events-auto">
+    <div className="fixed inset-0 w-full h-full -z-10 bg-gray-50 pointer-events-auto">
       <Canvas
         camera={{ position: [0, 0, 8], fov: 45 }}
         gl={{ antialias: true, alpha: false }}

@@ -74,7 +74,7 @@ export default function PublicQuotationPage({ params }: { params: { token: strin
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6">
         <div className="bg-white p-8 rounded-2xl shadow-sm text-center max-w-md w-full border border-gray-200">
-          <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <FileText className="w-12 h-12 text-gray-600 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-900 mb-2">Unavailable</h2>
           <p className="text-gray-500 text-sm">{error}</p>
         </div>
@@ -95,7 +95,7 @@ export default function PublicQuotationPage({ params }: { params: { token: strin
           {company.logoUrl ? (
             <img src={company.logoUrl} alt="Logo" className="h-16 w-auto mb-4 rounded-lg object-contain bg-white p-2 shadow-sm" />
           ) : (
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center font-bold text-white text-2xl mb-4 shadow-sm" style={{ backgroundColor: brandPrimary }}>
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center font-bold text-gray-900 text-2xl mb-4 shadow-sm" style={{ backgroundColor: brandPrimary }}>
               {company.name[0]}
             </div>
           )}
@@ -107,12 +107,12 @@ export default function PublicQuotationPage({ params }: { params: { token: strin
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200">
           <div className="p-8 sm:p-12 border-b border-gray-100 flex flex-col sm:flex-row justify-between gap-8">
             <div>
-              <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Prepared For</h2>
+              <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Prepared For</h2>
               <p className="text-lg font-bold text-gray-900">{client.name}</p>
               <p className="text-sm text-gray-500">{client.email || client.phone}</p>
             </div>
             <div className="sm:text-right">
-              <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Quotation</h2>
+              <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Quotation</h2>
               <p className="text-lg font-bold text-gray-900">{quotationNumber}</p>
               <p className="text-sm text-gray-500">Date: {new Date(createdAt).toLocaleDateString()}</p>
             </div>
@@ -184,7 +184,7 @@ export default function PublicQuotationPage({ params }: { params: { token: strin
               <button 
                 onClick={handleSign}
                 disabled={signing}
-                className="w-full sm:w-auto px-8 py-3.5 text-white font-bold rounded-xl shadow-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-8 py-3.5 text-gray-900 font-bold rounded-xl shadow-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                 style={{ backgroundColor: brandPrimary }}
               >
                 {signing && <Loader2 className="w-5 h-5 animate-spin" />}

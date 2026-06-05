@@ -103,12 +103,12 @@ export default function ClientsPage() {
     <div className="space-y-8 animate-fade-in relative">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white">Clients Directory</h1>
-          <p className="text-gray-400 text-sm mt-1">Manage client contact cards, project lists, and balance ledgers.</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">Clients Directory</h1>
+          <p className="text-gray-500 text-sm mt-1">Manage client contact cards, project lists, and balance ledgers.</p>
         </div>
         <button
           onClick={() => setShowAddForm(true)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold text-xs rounded-xl shadow-lg transition-all"
+          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-gray-900 font-semibold text-xs rounded-xl shadow-lg transition-all"
         >
           <UserPlus className="w-4 h-4" /> Add New Client
         </button>
@@ -120,7 +120,7 @@ export default function ClientsPage() {
         placeholder="Search by client name, email or phone..."
         value={search}
         onChange={e => setSearch(e.target.value)}
-        className="w-full px-4 py-3 bg-[#0f0f13] border border-white/[0.06] rounded-xl focus:outline-none focus:border-violet-500 text-xs text-white"
+        className="w-full px-4 py-3 bg-[#0f0f13] border border-white/[0.06] rounded-xl focus:outline-none focus:border-violet-500 text-xs text-gray-900"
       />
 
       {/* Client layout */}
@@ -135,11 +135,11 @@ export default function ClientsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-white/[0.05] bg-white/[0.01]">
-                    <th className="p-4 font-bold text-gray-400">Client Details</th>
-                    <th className="p-4 font-bold text-gray-400">Campaigns</th>
-                    <th className="p-4 font-bold text-gray-400">Total Billed</th>
-                    <th className="p-4 font-bold text-gray-400">Outstanding Balance</th>
+                  <tr className="border-b border-gray-200 bg-white">
+                    <th className="p-4 font-bold text-gray-500">Client Details</th>
+                    <th className="p-4 font-bold text-gray-500">Campaigns</th>
+                    <th className="p-4 font-bold text-gray-500">Total Billed</th>
+                    <th className="p-4 font-bold text-gray-500">Outstanding Balance</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -147,8 +147,8 @@ export default function ClientsPage() {
                     <tr
                       key={c.id}
                       onClick={() => fetchClientDetails(c.id)}
-                      className={`border-b border-white/[0.03] hover:bg-white/[0.01] cursor-pointer transition-colors ${
-                        selectedClient?.id === c.id ? 'bg-white/[0.02]' : ''
+                      className={`border-b border-gray-100 hover:bg-white cursor-pointer transition-colors ${
+                        selectedClient?.id === c.id ? 'bg-gray-50' : ''
                       }`}
                     >
                       <td className="p-4">
@@ -157,7 +157,7 @@ export default function ClientsPage() {
                             {c.name[0]}
                           </div>
                           <div>
-                            <p className="font-semibold text-white">{c.name}</p>
+                            <p className="font-semibold text-gray-900">{c.name}</p>
                             <span className="text-[10px] text-gray-500 block mt-0.5">{c.email || 'No Email'} &bull; {c.phone || 'No Phone'}</span>
                           </div>
                         </div>
@@ -167,7 +167,7 @@ export default function ClientsPage() {
                           {c.eventsCount} Events
                         </span>
                       </td>
-                      <td className="p-4 font-medium text-gray-300">
+                      <td className="p-4 font-medium text-gray-600">
                         AED {c.totalBilled.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </td>
                       <td className="p-4">
@@ -193,50 +193,50 @@ export default function ClientsPage() {
             <div className="glass-panel p-6 rounded-2xl space-y-6 animate-fade-in">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-bold text-white text-md">{selectedClient.name}</h3>
+                  <h3 className="font-bold text-gray-900 text-md">{selectedClient.name}</h3>
                   <p className="text-[10px] text-gray-500 mt-0.5">Customer Ledger Profile</p>
                 </div>
-                <button onClick={() => setSelectedClient(null)} className="text-gray-500 hover:text-white">
+                <button onClick={() => setSelectedClient(null)} className="text-gray-500 hover:text-gray-900">
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               {/* General contact information */}
-              <div className="space-y-4 text-xs border-t border-white/[0.05] pt-4">
+              <div className="space-y-4 text-xs border-t border-gray-200 pt-4">
                 {selectedClient.email && (
-                  <div className="flex items-center gap-2 text-gray-300">
+                  <div className="flex items-center gap-2 text-gray-600">
                     <Mail className="w-4 h-4 text-gray-500 shrink-0" />
                     <span className="truncate">{selectedClient.email}</span>
                   </div>
                 )}
                 {selectedClient.phone && (
-                  <div className="flex items-center gap-2 text-gray-300">
+                  <div className="flex items-center gap-2 text-gray-600">
                     <Phone className="w-4 h-4 text-gray-500 shrink-0" />
                     <span>{selectedClient.phone}</span>
                   </div>
                 )}
                 {selectedClient.address && (
-                  <div className="flex items-start gap-2 text-gray-300">
+                  <div className="flex items-start gap-2 text-gray-600">
                     <MapPin className="w-4 h-4 text-gray-500 shrink-0 mt-0.5" />
                     <span>{selectedClient.address}</span>
                   </div>
                 )}
                 {selectedClient.notes && (
-                  <div className="flex items-start gap-2 text-gray-300 bg-white/[0.01] p-3 rounded-xl border border-white/[0.04]">
+                  <div className="flex items-start gap-2 text-gray-600 bg-white p-3 rounded-xl border border-gray-200">
                     <Notebook className="w-4 h-4 text-gray-500 shrink-0 mt-0.5" />
-                    <span className="text-[11px] leading-relaxed text-gray-400">{selectedClient.notes}</span>
+                    <span className="text-[11px] leading-relaxed text-gray-500">{selectedClient.notes}</span>
                   </div>
                 )}
               </div>
 
               {/* Event booking listing */}
-              <div className="space-y-3 border-t border-white/[0.05] pt-4 text-xs">
+              <div className="space-y-3 border-t border-gray-200 pt-4 text-xs">
                 <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Historical Campaigns</h4>
                 {selectedClient.events && selectedClient.events.length > 0 ? (
                   <div className="space-y-2">
                     {selectedClient.events.map((e: any) => (
-                      <div key={e.id} className="p-2 bg-black/30 border border-white/[0.04] rounded-lg">
-                        <p className="font-semibold text-white truncate">{e.title}</p>
+                      <div key={e.id} className="p-2 bg-black/30 border border-gray-200 rounded-lg">
+                        <p className="font-semibold text-gray-900 truncate">{e.title}</p>
                         <span className="text-[9px] text-gray-500 block mt-0.5">{new Date(e.eventDate).toISOString().split('T')[0]}</span>
                       </div>
                     ))}
@@ -247,19 +247,19 @@ export default function ClientsPage() {
               </div>
 
               {/* Balance Card summary */}
-              <div className="space-y-3 border-t border-white/[0.05] pt-4 text-xs">
+              <div className="space-y-3 border-t border-gray-200 pt-4 text-xs">
                 <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Financial Overview</h4>
-                <div className="p-3 bg-black/40 border border-white/[0.04] rounded-xl space-y-2">
+                <div className="p-3 bg-white/80 border border-gray-200 rounded-xl space-y-2">
                   <div className="flex justify-between">
                     <span className="text-gray-500">Gross Billings</span>
-                    <span className="text-white font-medium">AED {selectedClient.totalBilled.toLocaleString()}</span>
+                    <span className="text-gray-900 font-medium">AED {selectedClient.totalBilled.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-500">Deposits Credited</span>
-                    <span className="text-white font-medium">AED {selectedClient.totalPaid.toLocaleString()}</span>
+                    <span className="text-gray-900 font-medium">AED {selectedClient.totalPaid.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between border-t border-white/[0.05] pt-2 font-bold">
-                    <span className="text-gray-400">Net Balance Due</span>
+                  <div className="flex justify-between border-t border-gray-200 pt-2 font-bold">
+                    <span className="text-gray-500">Net Balance Due</span>
                     <span className={selectedClient.outstandingBalance > 0 ? 'text-red-400' : 'text-emerald-400'}>
                       AED {selectedClient.outstandingBalance.toLocaleString()}
                     </span>
@@ -277,9 +277,9 @@ export default function ClientsPage() {
 
       {/* Add Client Dialog Form */}
       {showAddForm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50 animate-fade-in">
-          <div className="bg-[#0f0f13] border border-white/[0.08] rounded-2xl max-w-md w-full p-8 shadow-2xl relative">
-            <button onClick={() => setShowAddForm(false)} className="absolute right-6 top-6 text-gray-500 hover:text-white">
+        <div className="fixed inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center p-6 z-50 animate-fade-in">
+          <div className="bg-[#0f0f13] border border-gray-300 rounded-2xl max-w-md w-full p-8 shadow-2xl relative">
+            <button onClick={() => setShowAddForm(false)} className="absolute right-6 top-6 text-gray-500 hover:text-gray-900">
               <X className="w-5 h-5" />
             </button>
             <div className="mb-6">
@@ -289,31 +289,31 @@ export default function ClientsPage() {
 
             <form onSubmit={handleAddClient} className="space-y-4">
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Client Full Name / Company</label>
-                <input type="text" name="name" required value={formData.name} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
+                <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Client Full Name / Company</label>
+                <input type="text" name="name" required value={formData.name} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-900" />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Work Email</label>
-                <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
+                <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Work Email</label>
+                <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-900" />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Phone</label>
-                <input type="text" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
+                <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Phone</label>
+                <input type="text" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-900" />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Billing Address</label>
-                <input type="text" name="address" value={formData.address} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
+                <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Billing Address</label>
+                <input type="text" name="address" value={formData.address} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-900" />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Internal Notes</label>
-                <textarea name="notes" rows={3} value={formData.notes} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white resize-none" />
+                <label className="block text-[10px] font-bold text-gray-500 uppercase mb-2">Internal Notes</label>
+                <textarea name="notes" rows={3} value={formData.notes} onChange={handleInputChange} className="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-xl text-xs text-gray-900 resize-none" />
               </div>
 
-              <div className="pt-4 border-t border-white/[0.04] flex justify-end gap-3">
-                <button type="button" onClick={() => setShowAddForm(false)} className="px-4 py-2 border border-white/[0.08] text-xs font-semibold rounded-xl text-gray-400 hover:text-white">
+              <div className="pt-4 border-t border-gray-200 flex justify-end gap-3">
+                <button type="button" onClick={() => setShowAddForm(false)} className="px-4 py-2 border border-gray-300 text-xs font-semibold rounded-xl text-gray-500 hover:text-gray-900">
                   Cancel
                 </button>
-                <button type="submit" className="px-6 py-2 bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs rounded-xl shadow-lg">
+                <button type="submit" className="px-6 py-2 bg-violet-600 hover:bg-violet-700 text-gray-900 font-semibold text-xs rounded-xl shadow-lg">
                   Register Client
                 </button>
               </div>

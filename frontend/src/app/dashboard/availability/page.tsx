@@ -86,12 +86,12 @@ export default function AvailabilityPage() {
     <div className="space-y-8 animate-fade-in relative">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white">Availability Management</h1>
-          <p className="text-gray-400 text-sm mt-1">Block out dates when you are unavailable for assignments or events.</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">Availability Management</h1>
+          <p className="text-gray-500 text-sm mt-1">Block out dates when you are unavailable for assignments or events.</p>
         </div>
         <button
           onClick={() => setShowAddForm(true)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold text-xs rounded-xl shadow-lg transition-all hover:opacity-90"
+          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-gray-900 font-semibold text-xs rounded-xl shadow-lg transition-all hover:opacity-90"
         >
           <Plus className="w-4 h-4" /> Block Out Dates
         </button>
@@ -101,13 +101,13 @@ export default function AvailabilityPage() {
         {availabilities.length === 0 ? (
           <div className="text-center py-12">
             <CalendarX2 className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-            <h3 className="text-white font-bold text-lg">No block out periods</h3>
+            <h3 className="text-gray-900 font-bold text-lg">No block out periods</h3>
             <p className="text-gray-500 text-sm mt-1">You are currently marked as available for all dates.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {availabilities.map((a: any) => (
-              <div key={a.id} className="p-5 bg-white/[0.02] border border-white/[0.05] rounded-xl flex flex-col relative group">
+              <div key={a.id} className="p-5 bg-gray-50 border border-gray-200 rounded-xl flex flex-col relative group">
                 <button
                   onClick={() => handleDelete(a.id)}
                   className="absolute top-4 right-4 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -121,12 +121,12 @@ export default function AvailabilityPage() {
                   <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">Unavailable</span>
                 </div>
                 <div className="space-y-1 mb-4">
-                  <p className="text-sm font-semibold text-white">
+                  <p className="text-sm font-semibold text-gray-900">
                     {new Date(a.startDate).toLocaleDateString()} &mdash; {new Date(a.endDate).toLocaleDateString()}
                   </p>
-                  <p className="text-xs text-gray-400">{a.reason || 'No reason provided'}</p>
+                  <p className="text-xs text-gray-500">{a.reason || 'No reason provided'}</p>
                 </div>
-                <div className="mt-auto pt-3 border-t border-white/[0.05] flex justify-between items-center">
+                <div className="mt-auto pt-3 border-t border-gray-200 flex justify-between items-center">
                   <span className="text-[10px] text-gray-500">Status: {a.status}</span>
                   {user?.role === 'COMPANY_ADMIN' && (
                      <span className="text-[10px] text-violet-400 font-semibold">{a.user?.firstName} {a.user?.lastName}</span>
@@ -139,9 +139,9 @@ export default function AvailabilityPage() {
       </div>
 
       {showAddForm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50 animate-fade-in">
-          <div className="bg-[#0f0f13] border border-white/[0.08] rounded-2xl max-w-md w-full p-8 shadow-2xl relative">
-            <button onClick={() => setShowAddForm(false)} className="absolute right-6 top-6 text-gray-500 hover:text-white">
+        <div className="fixed inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center p-6 z-50 animate-fade-in">
+          <div className="bg-[#0f0f13] border border-gray-300 rounded-2xl max-w-md w-full p-8 shadow-2xl relative">
+            <button onClick={() => setShowAddForm(false)} className="absolute right-6 top-6 text-gray-500 hover:text-gray-900">
               <X className="w-5 h-5" />
             </button>
             <div className="mb-6">
@@ -152,43 +152,43 @@ export default function AvailabilityPage() {
             <form onSubmit={handleAdd} className="space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Start Date</label>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Start Date</label>
                   <input
                     type="date"
                     required
                     value={startDate}
                     onChange={e => setStartDate(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-black/40 border border-white/[0.08] rounded-xl focus:outline-none focus:border-violet-500 text-sm text-white"
+                    className="w-full px-4 py-2.5 bg-white/80 border border-gray-300 rounded-xl focus:outline-none focus:border-violet-500 text-sm text-gray-900"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">End Date</label>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">End Date</label>
                   <input
                     type="date"
                     required
                     value={endDate}
                     onChange={e => setEndDate(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-black/40 border border-white/[0.08] rounded-xl focus:outline-none focus:border-violet-500 text-sm text-white"
+                    className="w-full px-4 py-2.5 bg-white/80 border border-gray-300 rounded-xl focus:outline-none focus:border-violet-500 text-sm text-gray-900"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Reason (Optional)</label>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Reason (Optional)</label>
                 <textarea
                   rows={2}
                   value={reason}
                   onChange={e => setReason(e.target.value)}
                   placeholder="e.g. Annual Leave, Double Booked..."
-                  className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:outline-none focus:border-violet-500 text-sm text-white resize-none"
+                  className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:outline-none focus:border-violet-500 text-sm text-gray-900 resize-none"
                 />
               </div>
 
               <div className="pt-4 flex gap-3">
-                <button type="button" onClick={() => setShowAddForm(false)} className="flex-1 px-4 py-2.5 border border-white/[0.08] font-semibold text-gray-400 hover:text-white rounded-xl">
+                <button type="button" onClick={() => setShowAddForm(false)} className="flex-1 px-4 py-2.5 border border-gray-300 font-semibold text-gray-500 hover:text-gray-900 rounded-xl">
                   Cancel
                 </button>
-                <button type="submit" className="flex-1 px-4 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl shadow-lg">
+                <button type="submit" className="flex-1 px-4 py-2.5 bg-violet-600 hover:bg-violet-700 text-gray-900 font-semibold rounded-xl shadow-lg">
                   Save Dates
                 </button>
               </div>

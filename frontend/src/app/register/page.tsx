@@ -55,30 +55,30 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] flex flex-col md:flex-row relative">
+    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row relative">
       {/* Background glow effects */}
       <div className="absolute top-[20%] left-[5%] w-[40%] h-[40%] bg-[#6d28d9]/10 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Left panel - Info panel */}
-      <div className="md:w-[40%] bg-[#0f0f13] border-r border-white/[0.05] p-12 flex flex-col justify-between relative overflow-hidden">
-        <Link href="/" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm">
+      <div className="md:w-[40%] bg-[#0f0f13] border-r border-gray-200 p-12 flex flex-col justify-between relative overflow-hidden">
+        <Link href="/" className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors text-sm">
           <ArrowLeft className="w-4 h-4" /> Back to home
         </Link>
 
         <div className="my-auto py-12">
           <div className="flex items-center gap-3 mb-8">
             <div className="p-2 bg-gradient-to-tr from-violet-600 to-indigo-600 rounded-lg shadow-lg">
-              <Camera className="w-6 h-6 text-white" />
+              <Camera className="w-6 h-6 text-gray-900" />
             </div>
             <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
               EVENTO
             </span>
           </div>
 
-          <h2 className="text-3xl font-extrabold text-white tracking-tight mb-4 leading-snug">
+          <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight mb-4 leading-snug">
             Launch Your Event Platform Instance in Minutes.
           </h2>
-          <p className="text-gray-400 leading-relaxed mb-8 text-sm">
+          <p className="text-gray-500 leading-relaxed mb-8 text-sm">
             Fill out the form to request activation. Our multi-tenant infrastructure provisions your dedicated subdomain and secure access controls dynamically.
           </p>
 
@@ -88,7 +88,7 @@ export default function RegisterPage() {
                 <ShieldCheck className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-white">Secure Isolation Boundary</p>
+                <p className="text-sm font-semibold text-gray-900">Secure Isolation Boundary</p>
                 <p className="text-xs text-gray-500 mt-0.5">Separate tenant database lookups and scopes.</p>
               </div>
             </div>
@@ -97,7 +97,7 @@ export default function RegisterPage() {
                 <HelpCircle className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-white">Instant Approval Simulation</p>
+                <p className="text-sm font-semibold text-gray-900">Instant Approval Simulation</p>
                 <p className="text-xs text-gray-500 mt-0.5">Use the Super Admin Console simulator to review and approve registrations instantly.</p>
               </div>
             </div>
@@ -117,15 +117,15 @@ export default function RegisterPage() {
               <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <ShieldCheck className="w-8 h-8 text-emerald-400" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-3">Application Submitted!</h3>
-              <p className="text-gray-400 text-sm mb-8 leading-relaxed">
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Application Submitted!</h3>
+              <p className="text-gray-500 text-sm mb-8 leading-relaxed">
                 Thank you for applying. To fast-track review, you can open the Super Admin Console simulator to approve this company immediately and generate credentials.
               </p>
               <div className="flex flex-col gap-3">
-                <Link href="/super-admin" className="w-full py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold rounded-xl hover:opacity-90 transition-all shadow-md">
+                <Link href="/super-admin" className="w-full py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-gray-900 font-semibold rounded-xl hover:opacity-90 transition-all shadow-md">
                   Go to Super Admin Approvals
                 </Link>
-                <Link href="/" className="w-full py-3 bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.06] text-gray-300 font-semibold rounded-xl transition-all">
+                <Link href="/" className="w-full py-3 bg-gray-100 border border-gray-300 hover:bg-white/[0.06] text-gray-600 font-semibold rounded-xl transition-all">
                   Back to Homepage
                 </Link>
               </div>
@@ -134,7 +134,7 @@ export default function RegisterPage() {
             <div className="glass-panel p-8 rounded-2xl shadow-xl shadow-black/40">
               <div className="mb-8">
                 <h3 className="text-2xl font-extrabold tracking-tight">Register Company</h3>
-                <p className="text-gray-400 text-sm mt-1">Provide your event organization credentials below.</p>
+                <p className="text-gray-500 text-sm mt-1">Provide your event organization credentials below.</p>
               </div>
 
               {error && (
@@ -146,7 +146,7 @@ export default function RegisterPage() {
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Company Name</label>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Company Name</label>
                     <input
                       type="text"
                       name="companyName"
@@ -154,11 +154,11 @@ export default function RegisterPage() {
                       placeholder="e.g. Shutter Studio"
                       value={formData.companyName}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:border-violet-500 focus:outline-none transition-all text-sm text-white"
+                      className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:border-violet-500 focus:outline-none transition-all text-sm text-gray-900"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Owner Full Name</label>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Owner Full Name</label>
                     <input
                       type="text"
                       name="ownerName"
@@ -166,14 +166,14 @@ export default function RegisterPage() {
                       placeholder="e.g. Alex Mercer"
                       value={formData.ownerName}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:border-violet-500 focus:outline-none transition-all text-sm text-white"
+                      className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:border-violet-500 focus:outline-none transition-all text-sm text-gray-900"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Email Address</label>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Email Address</label>
                     <input
                       type="email"
                       name="email"
@@ -181,11 +181,11 @@ export default function RegisterPage() {
                       placeholder="owner@shutter.com"
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:border-violet-500 focus:outline-none transition-all text-sm text-white"
+                      className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:border-violet-500 focus:outline-none transition-all text-sm text-gray-900"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Phone Number</label>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Phone Number</label>
                     <input
                       type="text"
                       name="phone"
@@ -193,57 +193,57 @@ export default function RegisterPage() {
                       placeholder="+971 50..."
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:border-violet-500 focus:outline-none transition-all text-sm text-white"
+                      className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:border-violet-500 focus:outline-none transition-all text-sm text-gray-900"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Country</label>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Country</label>
                     <input
                       type="text"
                       name="country"
                       required
                       value={formData.country}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:border-violet-500 focus:outline-none transition-all text-sm text-white"
+                      className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:border-violet-500 focus:outline-none transition-all text-sm text-gray-900"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">City</label>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">City</label>
                     <input
                       type="text"
                       name="city"
                       required
                       value={formData.city}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:border-violet-500 focus:outline-none transition-all text-sm text-white"
+                      className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:border-violet-500 focus:outline-none transition-all text-sm text-gray-900"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Employee Count</label>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Employee Count</label>
                     <input
                       type="number"
                       name="employeeCount"
                       min={1}
                       value={formData.employeeCount}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:border-violet-500 focus:outline-none transition-all text-sm text-white"
+                      className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:border-violet-500 focus:outline-none transition-all text-sm text-gray-900"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Company Logo URL (Optional)</label>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Company Logo URL (Optional)</label>
                     <input
                       type="text"
                       name="logoUrl"
                       placeholder="https://..."
                       value={formData.logoUrl}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-black/40 border border-white/[0.08] rounded-xl focus:border-violet-500 focus:outline-none transition-all text-sm text-white"
+                      className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:border-violet-500 focus:outline-none transition-all text-sm text-gray-900"
                     />
                   </div>
                 </div>
@@ -252,7 +252,7 @@ export default function RegisterPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm font-semibold rounded-xl hover:opacity-95 shadow-md shadow-violet-500/10 disabled:opacity-50 transition-all"
+                    className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-gray-900 text-sm font-semibold rounded-xl hover:opacity-95 shadow-md shadow-violet-500/10 disabled:opacity-50 transition-all"
                   >
                     {loading ? 'Submitting Application...' : 'Submit Registration'} <ArrowRight className="w-4 h-4" />
                   </button>

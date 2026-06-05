@@ -50,7 +50,7 @@ export default function AiAgentWidget({ brandColor = '#8b5cf6' }: { brandColor?:
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 p-4 text-white rounded-full shadow-2xl transition-transform hover:scale-110 z-40 ${isOpen ? 'scale-0' : 'scale-100'}`}
+        className={`fixed bottom-6 right-6 p-4 text-gray-900 rounded-full shadow-2xl transition-transform hover:scale-110 z-40 ${isOpen ? 'scale-0' : 'scale-100'}`}
         style={{ backgroundColor: brandColor }}
       >
         <Bot className="w-6 h-6" />
@@ -60,25 +60,25 @@ export default function AiAgentWidget({ brandColor = '#8b5cf6' }: { brandColor?:
       {isOpen && (
         <div className="fixed bottom-6 right-6 w-80 sm:w-96 bg-[#0f0f13] border border-white/[0.1] rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden animate-fade-in" style={{ height: '500px', maxHeight: '80vh' }}>
           {/* Header */}
-          <div className="p-4 flex items-center justify-between text-white" style={{ backgroundColor: brandColor }}>
+          <div className="p-4 flex items-center justify-between text-gray-900" style={{ backgroundColor: brandColor }}>
             <div className="flex items-center gap-2">
               <Bot className="w-5 h-5" />
               <span className="font-bold text-sm tracking-wide">AI Assistant</span>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white transition-colors">
+            <button onClick={() => setIsOpen(false)} className="text-gray-900/80 hover:text-gray-900 transition-colors">
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-black/40">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white/80">
             {messages.map((m, idx) => (
               <div key={idx} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div 
                   className={`px-4 py-2 text-xs leading-relaxed max-w-[85%] rounded-2xl ${
                     m.role === 'user' 
-                      ? 'text-white' 
-                      : 'bg-white/[0.05] border border-white/[0.05] text-gray-300'
+                      ? 'text-gray-900' 
+                      : 'bg-gray-100 border border-gray-200 text-gray-600'
                   }`}
                   style={m.role === 'user' ? { backgroundColor: brandColor, borderBottomRightRadius: '4px' } : { borderBottomLeftRadius: '4px' }}
                 >
@@ -88,7 +88,7 @@ export default function AiAgentWidget({ brandColor = '#8b5cf6' }: { brandColor?:
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="px-4 py-3 bg-white/[0.05] border border-white/[0.05] text-gray-400 rounded-2xl rounded-bl-sm">
+                <div className="px-4 py-3 bg-gray-100 border border-gray-200 text-gray-500 rounded-2xl rounded-bl-sm">
                   <Loader2 className="w-4 h-4 animate-spin" />
                 </div>
               </div>
@@ -97,7 +97,7 @@ export default function AiAgentWidget({ brandColor = '#8b5cf6' }: { brandColor?:
           </div>
 
           {/* Input Area */}
-          <div className="p-3 border-t border-white/[0.05] bg-[#0f0f13]">
+          <div className="p-3 border-t border-gray-200 bg-[#0f0f13]">
             <form onSubmit={handleSend} className="relative flex items-center">
               <input
                 type="text"
@@ -105,12 +105,12 @@ export default function AiAgentWidget({ brandColor = '#8b5cf6' }: { brandColor?:
                 onChange={e => setInput(e.target.value)}
                 placeholder="Ask me anything..."
                 disabled={loading}
-                className="w-full bg-black/40 border border-white/[0.08] text-white text-xs rounded-full pl-4 pr-12 py-3 focus:outline-none focus:border-white/20 transition-colors"
+                className="w-full bg-white/80 border border-gray-300 text-gray-900 text-xs rounded-full pl-4 pr-12 py-3 focus:outline-none focus:border-white/20 transition-colors"
               />
               <button 
                 type="submit" 
                 disabled={loading || !input.trim()}
-                className="absolute right-2 p-1.5 text-white/50 hover:text-white disabled:opacity-50 transition-colors"
+                className="absolute right-2 p-1.5 text-gray-900/50 hover:text-gray-900 disabled:opacity-50 transition-colors"
               >
                 <Send className="w-4 h-4" />
               </button>

@@ -94,10 +94,10 @@ export default function CalendarPage() {
     <div className="space-y-8 animate-fade-in relative h-full flex flex-col">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white">Master Schedule</h1>
-          <p className="text-gray-400 text-sm mt-1">Global view of all upcoming events, vendor assignments, and blocked dates.</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">Master Schedule</h1>
+          <p className="text-gray-500 text-sm mt-1">Global view of all upcoming events, vendor assignments, and blocked dates.</p>
         </div>
-        <button className="flex items-center gap-2 px-5 py-2.5 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-white font-semibold text-xs rounded-xl transition-all">
+        <button className="flex items-center gap-2 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 border border-white/[0.1] text-gray-900 font-semibold text-xs rounded-xl transition-all">
            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12.545 10.239v3.821h5.445c-.712 2.315-2.662 3.999-5.445 3.999-3.332 0-6.033-2.701-6.033-6.032s2.701-6.032 6.033-6.032c1.498 0 2.866.549 3.921 1.453l2.814-2.814C17.523 2.978 15.222 2 12.545 2 7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.761h-9.426z"/>
            </svg>

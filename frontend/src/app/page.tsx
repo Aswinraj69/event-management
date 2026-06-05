@@ -51,9 +51,7 @@ export default function HomePage() {
           <Link href="/register" className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 rounded-xl hover:opacity-95 shadow-xl shadow-violet-500/15 transition-all">
             Register Company <ChevronRight className="w-4 h-4" />
           </Link>
-          <Link href="/super-admin" className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 font-semibold text-gray-300 bg-white/[0.03] border border-white/[0.08] rounded-xl hover:bg-white/[0.06] transition-all">
-            <Building2 className="w-4 h-4 text-gray-400" /> Super Admin Simulator
-          </Link>
+
         </div>
 
         {/* Feature Grid */}

@@ -189,9 +189,7 @@ export default function SuperAdminPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <Link href="/" className="text-xs text-gray-500 hover:text-white transition-colors">
-              Return to public homepage
-            </Link>
+
           </div>
         </div>
       </div>
@@ -299,7 +297,8 @@ export default function SuperAdminPage() {
               </div>
             </div>
             <Link
-              href={`/login?subdomain=${approvedDetails.subdomain}`}
+              href={`${process.env.NEXT_PUBLIC_TENANT_APP_URL || 'http://localhost:3000'}/login?subdomain=${approvedDetails.subdomain}`}
+              target="_blank"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-xs rounded-lg shadow transition-all"
             >
               Simulate Login on `{approvedDetails.subdomain}`
@@ -321,9 +320,7 @@ export default function SuperAdminPage() {
               <div className="glass-panel p-12 text-center rounded-2xl">
                 <FileClock className="w-12 h-12 text-gray-600 mx-auto mb-4" />
                 <p className="text-gray-400 text-sm">No pending onboarding applications at this time.</p>
-                <Link href="/register" className="text-violet-400 hover:text-violet-300 text-xs font-medium mt-2 block">
-                  Submit a new registration request
-                </Link>
+
               </div>
             ) : (
               <div className="space-y-4">
@@ -412,7 +409,8 @@ export default function SuperAdminPage() {
 
                     <div className="flex justify-between items-center">
                       <Link
-                        href={`/login?subdomain=${comp.subdomain}`}
+                        href={`${process.env.NEXT_PUBLIC_TENANT_APP_URL || 'http://localhost:3000'}/login?subdomain=${comp.subdomain}`}
+                        target="_blank"
                         className="text-xs text-violet-400 hover:text-violet-300 font-semibold"
                       >
                         Portal Login &rarr;

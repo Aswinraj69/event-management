@@ -217,9 +217,9 @@ export default function EventsPage() {
         {/* Event cards lists column */}
         <div className="lg:col-span-2 space-y-4">
           {loading ? (
-            <div className="glass-panel p-10 text-center text-xs text-gray-500">Loading events...</div>
+            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-10 text-center text-xs text-gray-500">Loading events...</div>
           ) : events.length === 0 ? (
-            <div className="glass-panel p-12 text-center text-xs text-gray-500">No scheduled events found.</div>
+            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-12 text-center text-xs text-gray-500">No scheduled events found.</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {events.map(event => {
@@ -267,7 +267,7 @@ export default function EventsPage() {
         {/* Detailed details inspector / assignment tools column */}
         <div>
           {selectedEvent ? (
-            <div className="glass-panel p-6 rounded-2xl animate-fade-in space-y-6">
+            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl animate-fade-in space-y-6">
               <div className="flex justify-between items-start">
                 <div>
                   <span className="text-[9px] font-bold bg-violet-600/10 border border-violet-500/20 text-violet-400 px-2 py-0.5 rounded-md uppercase">
@@ -282,7 +282,7 @@ export default function EventsPage() {
 
               {/* Roster Assignment panel - Admin Mode */}
               {isAdmin ? (
-                <div className="space-y-4 border-t border-white/[0.05] pt-4 text-xs">
+                <div className="space-y-4 border-t border-white/10 pt-4 text-xs">
                   <div className="flex justify-between items-center">
                     <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider"> Roster Allocation</h4>
                     <span className="text-[9px] text-gray-400">Double booking guarded</span>
@@ -338,7 +338,7 @@ export default function EventsPage() {
                 </div>
               ) : (
                 /* Staff member viewing panel */
-                <div className="space-y-4 border-t border-white/[0.05] pt-4 text-xs">
+                <div className="space-y-4 border-t border-white/10 pt-4 text-xs">
                   <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Crew assignments</h4>
                   <div className="space-y-2">
                     {selectedEvent.staffAssignments.map((a: any) => (
@@ -361,7 +361,7 @@ export default function EventsPage() {
                     const myAssign = selectedEvent.staffAssignments.find((a: any) => a.user.id === user?.userId);
                     if (myAssign && myAssign.status === 'PENDING') {
                       return (
-                        <div className="pt-4 border-t border-white/[0.05] space-y-2">
+                        <div className="pt-4 border-t border-white/10 space-y-2">
                           <p className="text-[10px] font-bold text-violet-400 flex items-center gap-1">
                             <AlertCircle className="w-3.5 h-3.5" /> Action Required: Confirm Availability
                           </p>
@@ -389,7 +389,7 @@ export default function EventsPage() {
 
               {/* Financial cards parameters for administrators */}
               {isAdmin && (
-                <div className="space-y-3 border-t border-white/[0.05] pt-4 text-xs">
+                <div className="space-y-3 border-t border-white/10 pt-4 text-xs">
                   <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
                     <Clipboard className="w-3.5 h-3.5" /> Project Budget ledger
                   </h4>
@@ -406,7 +406,7 @@ export default function EventsPage() {
                       <span className="text-gray-500">Additional Expenses</span>
                       <span className="text-white font-medium">AED {Number(selectedEvent.additionalExpenses).toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between border-t border-white/[0.05] pt-2 font-bold">
+                    <div className="flex justify-between border-t border-white/10 pt-2 font-bold">
                       <span className="text-gray-400">Net Estimated Profit</span>
                       <span className="text-emerald-400">AED {Number(selectedEvent.profit).toLocaleString()}</span>
                     </div>
@@ -415,7 +415,7 @@ export default function EventsPage() {
               )}
             </div>
           ) : (
-            <div className="glass-panel p-8 text-center rounded-2xl text-xs text-gray-500 border-dashed">
+            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-8 text-center rounded-2xl text-xs text-gray-500 border-dashed">
               Select an event card to schedule crew roster, manage double bookings, and check budget logs.
             </div>
           )}

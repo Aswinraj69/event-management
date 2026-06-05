@@ -3,7 +3,13 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Camera, Building2, UserSquare2, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Camera, Building2, UserSquare2, Eye, EyeOff, Loader2, ArrowRight, KeyRound } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+const Hero3D = dynamic(() => import('../../components/Hero3D'), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 w-full h-full -z-10 bg-[#020617] animate-pulse" />
+});
 
 function LoginContent() {
   const router = useRouter();
@@ -99,7 +105,7 @@ function LoginContent() {
   // 1. STEP ONE: RESOLVE SUBDOMAIN CONTEXT (if not loaded yet)
   if (!subdomainResolved) {
     return (
-      <div className="min-h-screen bg-[#09090b] flex flex-col justify-center items-center p-6 relative">
+      <div className="min-h-screen bg-transparent flex flex-col justify-center items-center p-6 relative">
         <div className="absolute top-[20%] w-[350px] h-[350px] bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="w-full max-w-md glass-panel p-8 rounded-2xl shadow-xl shadow-black/50 z-10">
@@ -142,7 +148,7 @@ function LoginContent() {
             </div>
           </form>
 
-          <div className="mt-8 border-t border-white/[0.05] pt-6 flex justify-between text-xs text-gray-500">
+          <div className="mt-8 border-t border-white/10 pt-6 flex justify-between text-xs text-gray-500">
             <Link href="/register" className="hover:text-white transition-colors">
               Need a company instance? Register
             </Link>
@@ -160,7 +166,8 @@ function LoginContent() {
   const brandPrimary = branding?.brandColors?.primary || '#8b5cf6';
 
   return (
-    <div className="min-h-screen bg-[#09090b] flex flex-col justify-center items-center p-6 relative">
+    <div className="min-h-screen bg-transparent flex flex-col justify-center items-center p-6 relative overflow-hidden">
+      <Hero3D />
       {/* Dynamic glow using company primary brand color */}
       <div
         className="absolute top-[20%] w-[350px] h-[350px] rounded-full blur-[100px] pointer-events-none opacity-20"
@@ -244,8 +251,8 @@ function LoginContent() {
         </form>
 
         {/* TESTING SHORTCUTS WIDGET */}
-        <div className="mt-8 pt-6 border-t border-white/[0.05]">
-          <div className="p-4 bg-white/[0.01] border border-white/[0.05] rounded-xl">
+        <div className="mt-8 pt-6 border-t border-white/10">
+          <div className="p-4 bg-black/10 backdrop-blur-md border border-white/10 rounded-xl">
             <h4 className="text-xs font-semibold text-gray-400 mb-3 flex items-center gap-1.5">
               <UserSquare2 className="w-3.5 h-3.5" /> Simulation Autofill Shortcuts
             </h4>
@@ -253,7 +260,7 @@ function LoginContent() {
               <button
                 onClick={() => autofillDemoCredentials('admin')}
                 className={`py-2 px-3 text-left rounded-lg border text-xs font-medium transition-all ${
-                  demoRole === 'admin' ? 'bg-violet-600/10 border-violet-500/40 text-violet-400' : 'bg-black/30 border-white/[0.05] hover:bg-black/50 text-gray-400'
+                  demoRole === 'admin' ? 'bg-violet-600/10 border-violet-500/40 text-violet-400' : 'bg-black/30 border-white/10 hover:bg-black/50 text-gray-400'
                 }`}
               >
                 <span className="block font-semibold text-white">Company Admin</span>
@@ -262,7 +269,7 @@ function LoginContent() {
               <button
                 onClick={() => autofillDemoCredentials('staff')}
                 className={`py-2 px-3 text-left rounded-lg border text-xs font-medium transition-all ${
-                  demoRole === 'staff' ? 'bg-violet-600/10 border-violet-500/40 text-violet-400' : 'bg-black/30 border-white/[0.05] hover:bg-black/50 text-gray-400'
+                  demoRole === 'staff' ? 'bg-violet-600/10 border-violet-500/40 text-violet-400' : 'bg-black/30 border-white/10 hover:bg-black/50 text-gray-400'
                 }`}
               >
                 <span className="block font-semibold text-white">Roster Staff</span>
@@ -278,7 +285,7 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex justify-center items-center bg-[#09090b]"><Loader2 className="w-8 h-8 animate-spin text-violet-500" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex justify-center items-center bg-[#020617]"><Loader2 className="w-8 h-8 animate-spin text-violet-500" /></div>}>
       <LoginContent />
     </Suspense>
   );

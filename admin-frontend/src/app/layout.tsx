@@ -1,8 +1,8 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'EVENTO - Event Company Management SaaS Platform',
-  description: 'Manage photography studios, media agencies, videography, wedding planners, schedules, and billing in one unified interface.',
+  title: 'EVENTO Super Admin Console',
+  description: 'Control the EVENTO multi-tenant SaaS platform. Approve registrations, manage tenants and configure subscription limits.',
 };
 
 export default function RootLayout({
@@ -12,7 +12,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="antialiased min-h-screen bg-[#09090b] text-[#fafafa]">
+      <body className="antialiased min-h-screen bg-[#020617] text-white selection:bg-violet-500/30">
         {children}
       </body>
     </html>

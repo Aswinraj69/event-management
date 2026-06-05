@@ -161,7 +161,7 @@ export default function InvoicesPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-white/[0.05] bg-white/[0.01]">
+                  <tr className="border-b border-white/10 bg-black/10 backdrop-blur-md">
                     <th className="p-4 font-bold text-gray-400">Invoice ID</th>
                     <th className="p-4 font-bold text-gray-400">Client / Event</th>
                     <th className="p-4 font-bold text-gray-400">Net Due Date</th>
@@ -176,8 +176,8 @@ export default function InvoicesPage() {
                       <tr
                         key={inv.id}
                         onClick={() => { setSelectedInv(inv); setShowPayForm(false); }}
-                        className={`border-b border-white/[0.03] hover:bg-white/[0.01] cursor-pointer transition-colors ${
-                          selectedInv?.id === inv.id ? 'bg-white/[0.02]' : ''
+                        className={`border-b border-white/[0.03] hover:bg-black/10 backdrop-blur-md cursor-pointer transition-colors ${
+                          selectedInv?.id === inv.id ? 'bg-black/20 backdrop-blur-xl' : ''
                         }`}
                       >
                         <td className="p-4 font-mono font-bold text-violet-400">{inv.invoiceNumber}</td>
@@ -209,8 +209,8 @@ export default function InvoicesPage() {
         {/* Detailed tax invoice PDF inspector + Payment Logger */}
         <div>
           {selectedInv ? (
-            <div className="glass-panel p-6 rounded-2xl space-y-6 animate-fade-in text-xs relative">
-              <div className="flex justify-between items-center border-b border-white/[0.05] pb-4">
+            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl space-y-6 animate-fade-in text-xs relative">
+              <div className="flex justify-between items-center border-b border-white/10 pb-4">
                 <div>
                   <h3 className="font-bold text-white text-md">Invoice Ledger</h3>
                   <p className="text-[10px] text-gray-500 mt-0.5">VAT and compliance parameters</p>
@@ -230,7 +230,7 @@ export default function InvoicesPage() {
                 <div className="flex justify-between items-start border-b border-white/[0.03] pb-3">
                   <div>
                     {selectedInv.company?.logoUrl ? (
-                      <img src={selectedInv.company.logoUrl} alt="Logo" className="w-10 h-10 object-cover rounded-lg border border-white/[0.05] mb-2" />
+                      <img src={selectedInv.company.logoUrl} alt="Logo" className="w-10 h-10 object-cover rounded-lg border border-white/10 mb-2" />
                     ) : (
                       <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center font-bold text-white mb-2">
                         {selectedInv.company?.name[0]}
@@ -270,7 +270,7 @@ export default function InvoicesPage() {
                       <span>- AED {Number(selectedInv.discount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                     </div>
                   )}
-                  <div className="flex justify-between border-t border-white/[0.05] pt-2 font-bold text-[11px] text-white">
+                  <div className="flex justify-between border-t border-white/10 pt-2 font-bold text-[11px] text-white">
                     <span>Grand Invoiced Total</span>
                     <span>AED {Number(selectedInv.totalAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   </div>
@@ -293,7 +293,7 @@ export default function InvoicesPage() {
               </div>
 
               {/* Payments log histories */}
-              <div className="space-y-3 border-t border-white/[0.05] pt-4">
+              <div className="space-y-3 border-t border-white/10 pt-4">
                 <h4 className="text-[9px] font-bold text-gray-500 uppercase tracking-wider">Payments Ledger</h4>
                 {selectedInv.payments && selectedInv.payments.length > 0 ? (
                   <div className="space-y-2 max-h-32 overflow-y-auto">
@@ -314,7 +314,7 @@ export default function InvoicesPage() {
 
               {/* Record Deposit controls (Admin only) */}
               {getInvoiceBalance(selectedInv) > 0 ? (
-                <div className="border-t border-white/[0.05] pt-4">
+                <div className="border-t border-white/10 pt-4">
                   {!showPayForm ? (
                     <button
                       onClick={() => {
@@ -326,7 +326,7 @@ export default function InvoicesPage() {
                       <DollarSign className="w-4 h-4" /> Record Deposit Payment
                     </button>
                   ) : (
-                    <form onSubmit={handleRecordPayment} className="space-y-3 bg-white/[0.01] border border-white/[0.05] p-4 rounded-xl animate-fade-in">
+                    <form onSubmit={handleRecordPayment} className="space-y-3 bg-black/10 backdrop-blur-md border border-white/10 p-4 rounded-xl animate-fade-in">
                       <div className="flex justify-between items-center mb-1">
                         <span className="font-bold text-[10px] text-violet-400">Record Deposit Transaction</span>
                         <button type="button" onClick={() => setShowPayForm(false)} className="text-gray-500 hover:text-white">
@@ -389,7 +389,7 @@ export default function InvoicesPage() {
               )}
             </div>
           ) : (
-            <div className="glass-panel p-8 text-center rounded-2xl text-xs text-gray-500 border-dashed">
+            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-8 text-center rounded-2xl text-xs text-gray-500 border-dashed">
               Select an invoice ledger to review tax summaries, print barcodes, and record client deposit payments.
             </div>
           )}

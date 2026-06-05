@@ -151,7 +151,7 @@ export default function DashboardPage() {
       {/* Numerical Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Card 1 */}
-        <div className="glass-panel p-6 rounded-2xl relative overflow-hidden">
+        <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl relative overflow-hidden">
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Revenue</p>
@@ -165,7 +165,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Card 2 */}
-        <div className="glass-panel p-6 rounded-2xl relative overflow-hidden">
+        <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl relative overflow-hidden">
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">Outstanding Balance</p>
@@ -179,7 +179,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Card 3 */}
-        <div className="glass-panel p-6 rounded-2xl relative overflow-hidden">
+        <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl relative overflow-hidden">
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">Paid Invoices</p>
@@ -193,7 +193,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Card 4 */}
-        <div className="glass-panel p-6 rounded-2xl relative overflow-hidden">
+        <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl relative overflow-hidden">
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">Pending Accounts</p>
@@ -210,7 +210,7 @@ export default function DashboardPage() {
       {/* Visual Chart and Activity layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Income Chart */}
-        <div className="glass-panel p-6 rounded-2xl lg:col-span-2">
+        <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl lg:col-span-2">
           <h4 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-6">Revenue Growth Trend</h4>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -232,7 +232,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Company Settings Summary */}
-        <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+        <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl flex flex-col justify-between">
           <div>
             <h4 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4">Tenant Parameters</h4>
             <div className="space-y-4 text-xs">
@@ -255,7 +255,7 @@ export default function DashboardPage() {
             </div>
           </div>
           
-          <div className="mt-6 p-4 bg-white/[0.01] border border-white/[0.05] rounded-xl flex items-center gap-3">
+          <div className="mt-6 p-4 bg-black/10 backdrop-blur-md border border-white/10 rounded-xl flex items-center gap-3">
             <Palette className="w-5 h-5 text-violet-400 shrink-0" />
             <div className="text-[10px] text-gray-400 leading-normal">
               Theme updates automatically propagate to your emails, quotation sheets, invoices, and login portals.
@@ -266,8 +266,8 @@ export default function DashboardPage() {
 
       {/* Branding Configuration Dashboard Module */}
       {isAdmin && (
-        <div className="glass-panel p-8 rounded-2xl">
-          <div className="mb-6 flex items-center justify-between border-b border-white/[0.05] pb-4">
+        <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-8 rounded-2xl">
+          <div className="mb-6 flex items-center justify-between border-b border-white/10 pb-4">
             <div className="flex gap-3 items-center">
               <div className="p-2 bg-violet-600/10 border border-violet-500/20 text-violet-400 rounded-xl">
                 <Palette className="w-5 h-5" />

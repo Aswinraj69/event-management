@@ -78,7 +78,7 @@ export default function AiAgentWidget({ brandColor = '#8b5cf6' }: { brandColor?:
                   className={`px-4 py-2 text-xs leading-relaxed max-w-[85%] rounded-2xl ${
                     m.role === 'user' 
                       ? 'text-white' 
-                      : 'bg-white/[0.05] border border-white/[0.05] text-gray-300'
+                      : 'bg-white/[0.05] border border-white/10 text-gray-300'
                   }`}
                   style={m.role === 'user' ? { backgroundColor: brandColor, borderBottomRightRadius: '4px' } : { borderBottomLeftRadius: '4px' }}
                 >
@@ -88,7 +88,7 @@ export default function AiAgentWidget({ brandColor = '#8b5cf6' }: { brandColor?:
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="px-4 py-3 bg-white/[0.05] border border-white/[0.05] text-gray-400 rounded-2xl rounded-bl-sm">
+                <div className="px-4 py-3 bg-white/[0.05] border border-white/10 text-gray-400 rounded-2xl rounded-bl-sm">
                   <Loader2 className="w-4 h-4 animate-spin" />
                 </div>
               </div>
@@ -97,7 +97,7 @@ export default function AiAgentWidget({ brandColor = '#8b5cf6' }: { brandColor?:
           </div>
 
           {/* Input Area */}
-          <div className="p-3 border-t border-white/[0.05] bg-[#0f0f13]">
+          <div className="p-3 border-t border-white/10 bg-[#0f0f13]">
             <form onSubmit={handleSend} className="relative flex items-center">
               <input
                 type="text"

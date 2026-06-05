@@ -193,7 +193,7 @@ export default function EmployeesPage() {
             </div>
             <button onClick={() => setOnboardedResult(null)} className="text-gray-500 hover:text-white text-xs">Dismiss</button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-black/40 p-4 rounded-xl border border-white/[0.05] text-xs">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-black/40 p-4 rounded-xl border border-white/10 text-xs">
             <div>
               <p className="text-gray-500">Onboarded Name</p>
               <p className="font-semibold text-white mt-1">{onboardedResult.firstName} {onboardedResult.lastName}</p>
@@ -253,7 +253,7 @@ export default function EmployeesPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-white/[0.05] bg-white/[0.01]">
+                  <tr className="border-b border-white/10 bg-black/10 backdrop-blur-md">
                     <th className="p-4 font-bold text-gray-400">Employee Details</th>
                     <th className="p-4 font-bold text-gray-400">Type / Designation</th>
                     <th className="p-4 font-bold text-gray-400">Visa / Passport Expiry</th>
@@ -265,8 +265,8 @@ export default function EmployeesPage() {
                     <tr
                       key={emp.id}
                       onClick={() => setSelectedEmployee(emp)}
-                      className={`border-b border-white/[0.03] hover:bg-white/[0.01] cursor-pointer transition-colors ${
-                        selectedEmployee?.id === emp.id ? 'bg-white/[0.02]' : ''
+                      className={`border-b border-white/[0.03] hover:bg-black/10 backdrop-blur-md cursor-pointer transition-colors ${
+                        selectedEmployee?.id === emp.id ? 'bg-black/20 backdrop-blur-xl' : ''
                       }`}
                     >
                       <td className="p-4">
@@ -316,7 +316,7 @@ export default function EmployeesPage() {
         {/* Detailed Inspector column */}
         <div>
           {selectedEmployee ? (
-            <div className="glass-panel p-6 rounded-2xl animate-fade-in space-y-6">
+            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl animate-fade-in space-y-6">
               <div className="flex justify-between items-start">
                 <div className="flex gap-3 items-center">
                   <div className="w-10 h-10 rounded-full bg-violet-600/10 flex items-center justify-center font-bold text-violet-400">
@@ -333,7 +333,7 @@ export default function EmployeesPage() {
               </div>
 
               {/* Personal details info list */}
-              <div className="space-y-4 text-xs border-t border-white/[0.05] pt-4">
+              <div className="space-y-4 text-xs border-t border-white/10 pt-4">
                 <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Contact & Credentials</h4>
                 <div className="flex items-center gap-2 text-gray-300">
                   <Mail className="w-4 h-4 text-gray-500 shrink-0" />
@@ -354,7 +354,7 @@ export default function EmployeesPage() {
               </div>
 
               {/* Skills checklist */}
-              <div className="space-y-3 border-t border-white/[0.05] pt-4 text-xs">
+              <div className="space-y-3 border-t border-white/10 pt-4 text-xs">
                 <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
                   <Award className="w-3.5 h-3.5" /> Capabilities
                 </h4>
@@ -372,7 +372,7 @@ export default function EmployeesPage() {
               </div>
 
               {/* Documents expirations inspector */}
-              <div className="space-y-3 border-t border-white/[0.05] pt-4 text-xs">
+              <div className="space-y-3 border-t border-white/10 pt-4 text-xs">
                 <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
                   <FileSearch className="w-3.5 h-3.5" /> Expiry Tracker
                 </h4>
@@ -402,7 +402,7 @@ export default function EmployeesPage() {
 
               {/* Actions footer */}
               {selectedEmployee.isActive && (
-                <div className="border-t border-white/[0.05] pt-4 flex gap-2">
+                <div className="border-t border-white/10 pt-4 flex gap-2">
                   <button
                     onClick={() => handleDeactivate(selectedEmployee.id)}
                     className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-red-500/5 hover:bg-red-500/10 border border-red-500/20 text-red-400 font-semibold rounded-xl text-xs transition-all"
@@ -413,7 +413,7 @@ export default function EmployeesPage() {
               )}
             </div>
           ) : (
-            <div className="glass-panel p-8 text-center rounded-2xl text-xs text-gray-500 border-dashed">
+            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-8 text-center rounded-2xl text-xs text-gray-500 border-dashed">
               Select an employee row to inspect visa credentials, driving license details, and profile metrics.
             </div>
           )}

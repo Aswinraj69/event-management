@@ -52,7 +52,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#09090b] flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-violet-500 animate-spin" />
       </div>
     );
@@ -76,13 +76,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div
-      className="min-h-screen bg-[#09090b] flex"
+      className="min-h-screen bg-transparent flex relative"
       style={{
         '--primary': brandPrimary,
       } as React.CSSProperties}
     >
+      {/* Deep cosmic background unique to dashboard */}
+      <div className="fixed inset-0 -z-10 bg-[#020617]" />
+      <div className="fixed inset-0 -z-10" style={{ background: 'radial-gradient(ellipse at 20% 50%, rgba(124,58,237,0.12) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(45,212,191,0.08) 0%, transparent 60%)' }} />
       {/* Sidebar navigation */}
-      <aside className="w-64 bg-[#0f0f13] border-r border-white/[0.05] flex flex-col justify-between p-6 z-10 shrink-0">
+      <aside className="w-64 glass-sidebar flex flex-col justify-between p-6 z-10 shrink-0">
         <div>
           {/* Logo brand indicator */}
           <div className="flex items-center gap-3 mb-8">
@@ -99,7 +102,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           {/* User profile identifier */}
-          <div className="mb-6 p-3 bg-white/[0.02] border border-white/[0.05] rounded-xl flex items-center gap-3">
+          <div className="mb-6 p-3 bg-black/20 backdrop-blur-xl border border-white/10 rounded-xl flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-violet-600/10 flex items-center justify-center font-bold text-[11px] text-violet-400">
               {user?.firstName[0]}{user?.lastName[0]}
             </div>
@@ -118,7 +121,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   key={item.path}
                   href={item.path}
                   className={`w-full flex items-center gap-3 px-4 py-3 text-xs font-medium rounded-xl transition-all ${
-                    active ? 'bg-white/[0.03] text-white border-l-2 border-solid' : 'text-gray-400 hover:text-white hover:bg-white/[0.01]'
+                    active ? 'bg-white/[0.03] text-white border-l-2 border-solid' : 'text-gray-400 hover:text-white hover:bg-black/10 backdrop-blur-md'
                   }`}
                   style={{ borderLeftColor: active ? brandPrimary : 'transparent' }}
                 >
@@ -132,14 +135,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors text-xs font-medium mt-auto pt-6 border-t border-white/[0.05]"
+          className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors text-xs font-medium mt-auto pt-6 border-t border-white/10"
         >
           <LogOut className="w-4 h-4" /> Sign Out
         </button>
       </aside>
 
       {/* Workspace Area */}
-      <main className="flex-1 p-8 overflow-y-auto max-w-6xl mx-auto relative">
+      <main className="flex-1 p-8 overflow-y-auto max-w-6xl mx-auto relative z-10">
         {children}
       </main>
 

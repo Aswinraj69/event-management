@@ -135,7 +135,7 @@ export default function ClientsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-white/[0.05] bg-white/[0.01]">
+                  <tr className="border-b border-white/10 bg-black/10 backdrop-blur-md">
                     <th className="p-4 font-bold text-gray-400">Client Details</th>
                     <th className="p-4 font-bold text-gray-400">Campaigns</th>
                     <th className="p-4 font-bold text-gray-400">Total Billed</th>
@@ -147,8 +147,8 @@ export default function ClientsPage() {
                     <tr
                       key={c.id}
                       onClick={() => fetchClientDetails(c.id)}
-                      className={`border-b border-white/[0.03] hover:bg-white/[0.01] cursor-pointer transition-colors ${
-                        selectedClient?.id === c.id ? 'bg-white/[0.02]' : ''
+                      className={`border-b border-white/[0.03] hover:bg-black/10 backdrop-blur-md cursor-pointer transition-colors ${
+                        selectedClient?.id === c.id ? 'bg-black/20 backdrop-blur-xl' : ''
                       }`}
                     >
                       <td className="p-4">
@@ -186,11 +186,11 @@ export default function ClientsPage() {
         {/* Client details inspector */}
         <div>
           {clientDetailsLoading ? (
-            <div className="glass-panel p-10 text-center rounded-2xl flex justify-center items-center">
+            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-10 text-center rounded-2xl flex justify-center items-center">
               <Loader2 className="w-5 h-5 animate-spin text-violet-500" />
             </div>
           ) : selectedClient ? (
-            <div className="glass-panel p-6 rounded-2xl space-y-6 animate-fade-in">
+            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl space-y-6 animate-fade-in">
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-bold text-white text-md">{selectedClient.name}</h3>
@@ -202,7 +202,7 @@ export default function ClientsPage() {
               </div>
 
               {/* General contact information */}
-              <div className="space-y-4 text-xs border-t border-white/[0.05] pt-4">
+              <div className="space-y-4 text-xs border-t border-white/10 pt-4">
                 {selectedClient.email && (
                   <div className="flex items-center gap-2 text-gray-300">
                     <Mail className="w-4 h-4 text-gray-500 shrink-0" />
@@ -222,7 +222,7 @@ export default function ClientsPage() {
                   </div>
                 )}
                 {selectedClient.notes && (
-                  <div className="flex items-start gap-2 text-gray-300 bg-white/[0.01] p-3 rounded-xl border border-white/[0.04]">
+                  <div className="flex items-start gap-2 text-gray-300 bg-black/10 backdrop-blur-md p-3 rounded-xl border border-white/[0.04]">
                     <Notebook className="w-4 h-4 text-gray-500 shrink-0 mt-0.5" />
                     <span className="text-[11px] leading-relaxed text-gray-400">{selectedClient.notes}</span>
                   </div>
@@ -230,7 +230,7 @@ export default function ClientsPage() {
               </div>
 
               {/* Event booking listing */}
-              <div className="space-y-3 border-t border-white/[0.05] pt-4 text-xs">
+              <div className="space-y-3 border-t border-white/10 pt-4 text-xs">
                 <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Historical Campaigns</h4>
                 {selectedClient.events && selectedClient.events.length > 0 ? (
                   <div className="space-y-2">
@@ -247,7 +247,7 @@ export default function ClientsPage() {
               </div>
 
               {/* Balance Card summary */}
-              <div className="space-y-3 border-t border-white/[0.05] pt-4 text-xs">
+              <div className="space-y-3 border-t border-white/10 pt-4 text-xs">
                 <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Financial Overview</h4>
                 <div className="p-3 bg-black/40 border border-white/[0.04] rounded-xl space-y-2">
                   <div className="flex justify-between">
@@ -258,7 +258,7 @@ export default function ClientsPage() {
                     <span className="text-gray-500">Deposits Credited</span>
                     <span className="text-white font-medium">AED {selectedClient.totalPaid.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between border-t border-white/[0.05] pt-2 font-bold">
+                  <div className="flex justify-between border-t border-white/10 pt-2 font-bold">
                     <span className="text-gray-400">Net Balance Due</span>
                     <span className={selectedClient.outstandingBalance > 0 ? 'text-red-400' : 'text-emerald-400'}>
                       AED {selectedClient.outstandingBalance.toLocaleString()}
@@ -268,7 +268,7 @@ export default function ClientsPage() {
               </div>
             </div>
           ) : (
-            <div className="glass-panel p-8 text-center rounded-2xl text-xs text-gray-500 border-dashed">
+            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-8 text-center rounded-2xl text-xs text-gray-500 border-dashed">
               Select a client row to audit invoicing records, billing histories, and active project notes.
             </div>
           )}

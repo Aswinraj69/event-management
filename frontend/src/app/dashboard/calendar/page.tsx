@@ -105,7 +105,7 @@ export default function CalendarPage() {
         </button>
       </header>
 
-      <div className="glass-panel p-6 rounded-2xl flex-1 min-h-[700px] overflow-hidden">
+      <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl flex-1 min-h-[700px] overflow-hidden">
         {/* Custom CSS overrides for dark mode react-big-calendar */}
         <style dangerouslySetInnerHTML={{__html: `
           .rbc-calendar { font-family: 'DM Sans', sans-serif; }

@@ -162,7 +162,7 @@ export default function QuotationsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-white/[0.05] bg-white/[0.01]">
+                  <tr className="border-b border-white/10 bg-black/10 backdrop-blur-md">
                     <th className="p-4 font-bold text-gray-400">Quote Number</th>
                     <th className="p-4 font-bold text-gray-400">Client / Event</th>
                     <th className="p-4 font-bold text-gray-400">Total Estimation</th>
@@ -174,8 +174,8 @@ export default function QuotationsPage() {
                     <tr
                       key={q.id}
                       onClick={() => setSelectedQuo(q)}
-                      className={`border-b border-white/[0.03] hover:bg-white/[0.01] cursor-pointer transition-colors ${
-                        selectedQuo?.id === q.id ? 'bg-white/[0.02]' : ''
+                      className={`border-b border-white/[0.03] hover:bg-black/10 backdrop-blur-md cursor-pointer transition-colors ${
+                        selectedQuo?.id === q.id ? 'bg-black/20 backdrop-blur-xl' : ''
                       }`}
                     >
                       <td className="p-4 font-mono font-bold text-violet-400">{q.quotationNumber}</td>
@@ -205,8 +205,8 @@ export default function QuotationsPage() {
         {/* Dynamic Branded PDF Preview Simulator Column */}
         <div>
           {selectedQuo ? (
-            <div className="glass-panel p-6 rounded-2xl space-y-6 animate-fade-in text-xs relative">
-              <div className="flex justify-between items-center border-b border-white/[0.05] pb-4">
+            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl space-y-6 animate-fade-in text-xs relative">
+              <div className="flex justify-between items-center border-b border-white/10 pb-4">
                 <div>
                   <h3 className="font-bold text-white text-md">Document Preview</h3>
                   <p className="text-[10px] text-gray-500 mt-0.5">Branded layout template</p>
@@ -221,7 +221,7 @@ export default function QuotationsPage() {
                 <div className="flex justify-between items-start border-b border-white/[0.03] pb-3">
                   <div>
                     {selectedQuo.company?.logoUrl ? (
-                      <img src={selectedQuo.company.logoUrl} alt="Logo" className="w-10 h-10 object-cover rounded-lg border border-white/[0.05] mb-2" />
+                      <img src={selectedQuo.company.logoUrl} alt="Logo" className="w-10 h-10 object-cover rounded-lg border border-white/10 mb-2" />
                     ) : (
                       <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center font-bold text-white mb-2">
                         {selectedQuo.company?.name[0]}
@@ -264,7 +264,7 @@ export default function QuotationsPage() {
                 </div>
 
                 {/* Grand total values */}
-                <div className="border-t border-white/[0.05] pt-3 flex justify-between font-bold text-[11px]">
+                <div className="border-t border-white/10 pt-3 flex justify-between font-bold text-[11px]">
                   <span className="text-gray-400">Total Valuation</span>
                   <span className="text-white">AED {computeQuoTotal(selectedQuo.services).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                 </div>
@@ -308,7 +308,7 @@ export default function QuotationsPage() {
                 
                 <button
                   onClick={handleCopyMagicLink}
-                  className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.05] text-white font-semibold rounded-xl transition-all"
+                  className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 text-white font-semibold rounded-xl transition-all"
                 >
                   <LinkIcon className="w-3.5 h-3.5" /> Copy Client Magic Link
                 </button>
@@ -325,7 +325,7 @@ export default function QuotationsPage() {
 
                 {/* Approve accept action simulation */}
                 {selectedQuo.status !== 'ACCEPTED' && (
-                  <div className="pt-2 border-t border-white/[0.05]">
+                  <div className="pt-2 border-t border-white/10">
                     <button
                       onClick={() => handleUpdateStatus(selectedQuo.id, 'ACCEPTED')}
                       className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl"
@@ -337,7 +337,7 @@ export default function QuotationsPage() {
               </div>
             </div>
           ) : (
-            <div className="glass-panel p-8 text-center rounded-2xl text-xs text-gray-500 border-dashed">
+            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-8 text-center rounded-2xl text-xs text-gray-500 border-dashed">
               Select a quotation record to render the branded customer PDF preview and dispatch simulated WhatsApp or email updates.
             </div>
           )}

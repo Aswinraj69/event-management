@@ -97,7 +97,7 @@ export default function AvailabilityPage() {
         </button>
       </header>
 
-      <div className="glass-panel p-8 rounded-2xl">
+      <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-8 rounded-2xl">
         {availabilities.length === 0 ? (
           <div className="text-center py-12">
             <CalendarX2 className="w-12 h-12 text-gray-500 mx-auto mb-4" />
@@ -107,7 +107,7 @@ export default function AvailabilityPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {availabilities.map((a: any) => (
-              <div key={a.id} className="p-5 bg-white/[0.02] border border-white/[0.05] rounded-xl flex flex-col relative group">
+              <div key={a.id} className="p-5 bg-black/20 backdrop-blur-xl border border-white/10 rounded-xl flex flex-col relative group">
                 <button
                   onClick={() => handleDelete(a.id)}
                   className="absolute top-4 right-4 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -126,7 +126,7 @@ export default function AvailabilityPage() {
                   </p>
                   <p className="text-xs text-gray-400">{a.reason || 'No reason provided'}</p>
                 </div>
-                <div className="mt-auto pt-3 border-t border-white/[0.05] flex justify-between items-center">
+                <div className="mt-auto pt-3 border-t border-white/10 flex justify-between items-center">
                   <span className="text-[10px] text-gray-500">Status: {a.status}</span>
                   {user?.role === 'COMPANY_ADMIN' && (
                      <span className="text-[10px] text-violet-400 font-semibold">{a.user?.firstName} {a.user?.lastName}</span>

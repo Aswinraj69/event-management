@@ -3,6 +3,12 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Camera, ShieldCheck, Check, Ban, FileClock, ClipboardCopy, Building2, LogOut, Loader2 } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+const Hero3D = dynamic(() => import('../components/Hero3D'), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 w-full h-full -z-10 bg-[#020617] animate-pulse" />
+});
 
 export default function SuperAdminPage() {
   const [token, setToken] = useState('');
@@ -138,7 +144,8 @@ export default function SuperAdminPage() {
   // 1. LOGIN SCREEN
   if (!token) {
     return (
-      <div className="min-h-screen bg-[#09090b] flex flex-col justify-center items-center p-6 relative">
+      <div className="min-h-screen bg-transparent flex flex-col justify-center items-center p-6 relative overflow-hidden">
+        <Hero3D />
         <div className="absolute top-[20%] w-[350px] h-[350px] bg-violet-600/10 rounded-full blur-[100px] pointer-events-none" />
         
         <div className="w-full max-w-md glass-panel p-8 rounded-2xl shadow-xl shadow-black/50 z-10">
@@ -198,9 +205,10 @@ export default function SuperAdminPage() {
 
   // 2. ADMIN PORTAL SCREEN
   return (
-    <div className="min-h-screen bg-[#09090b] flex">
+    <div className="min-h-screen bg-transparent flex relative overflow-hidden">
+      <Hero3D />
       {/* Sidebar */}
-      <aside className="w-64 bg-[#0f0f13] border-r border-white/[0.05] flex flex-col justify-between p-6">
+      <aside className="w-64 bg-black/50 backdrop-blur-3xl border-r border-white/10 flex flex-col justify-between p-6 z-10 relative">
         <div>
           <div className="flex items-center gap-2 mb-8">
             <div className="p-1.5 bg-gradient-to-tr from-violet-600 to-indigo-600 rounded-md">
@@ -215,7 +223,7 @@ export default function SuperAdminPage() {
             <button
               onClick={() => setActiveTab('pending')}
               className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all ${
-                activeTab === 'pending' ? 'bg-violet-600/10 text-violet-400 border-l-2 border-violet-500' : 'text-gray-400 hover:text-white hover:bg-white/[0.02]'
+                activeTab === 'pending' ? 'bg-violet-600/10 text-violet-400 border-l-2 border-violet-500' : 'text-gray-400 hover:text-white hover:bg-black/20 backdrop-blur-xl'
               }`}
             >
               <FileClock className="w-4 h-4" />
@@ -224,7 +232,7 @@ export default function SuperAdminPage() {
             <button
               onClick={() => setActiveTab('companies')}
               className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all ${
-                activeTab === 'companies' ? 'bg-violet-600/10 text-violet-400 border-l-2 border-violet-500' : 'text-gray-400 hover:text-white hover:bg-white/[0.02]'
+                activeTab === 'companies' ? 'bg-violet-600/10 text-violet-400 border-l-2 border-violet-500' : 'text-gray-400 hover:text-white hover:bg-black/20 backdrop-blur-xl'
               }`}
             >
               <Building2 className="w-4 h-4" />
@@ -242,10 +250,10 @@ export default function SuperAdminPage() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 p-10 overflow-y-auto max-w-6xl mx-auto">
+      <main className="flex-1 p-10 overflow-y-auto max-w-6xl mx-auto relative z-10">
         <header className="flex justify-between items-center mb-10">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight">Super Admin Dashboard</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight text-white">Super Admin Dashboard</h1>
             <p className="text-gray-400 text-sm mt-1">Review onboarding requests and configure active subscription limits.</p>
           </div>
         </header>
@@ -271,7 +279,7 @@ export default function SuperAdminPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-black/40 p-4 rounded-xl border border-white/[0.05] text-sm mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-black/40 p-4 rounded-xl border border-white/10 text-sm mb-4">
               <div>
                 <p className="text-gray-500 text-xs">Provisioned Subdomain</p>
                 <p className="font-mono text-violet-400 mt-1">{approvedDetails.subdomain}.evento.com</p>
@@ -317,7 +325,7 @@ export default function SuperAdminPage() {
             </h2>
 
             {registrations.filter(r => r.status === 'PENDING').length === 0 ? (
-              <div className="glass-panel p-12 text-center rounded-2xl">
+              <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-12 text-center rounded-2xl">
                 <FileClock className="w-12 h-12 text-gray-600 mx-auto mb-4" />
                 <p className="text-gray-400 text-sm">No pending onboarding applications at this time.</p>
 
@@ -327,10 +335,10 @@ export default function SuperAdminPage() {
                 {registrations
                   .filter(r => r.status === 'PENDING')
                   .map((reg) => (
-                    <div key={reg.id} className="glass-panel p-6 rounded-2xl flex flex-col md:flex-row justify-between md:items-center gap-6 animate-fade-in">
+                    <div key={reg.id} className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl flex flex-col md:flex-row justify-between md:items-center gap-6 animate-fade-in">
                       <div className="flex gap-4 items-center">
                         {reg.logoUrl ? (
-                          <img src={reg.logoUrl} alt="logo" className="w-12 h-12 rounded-xl object-cover border border-white/[0.05]" />
+                          <img src={reg.logoUrl} alt="logo" className="w-12 h-12 rounded-xl object-cover border border-white/10" />
                         ) : (
                           <div className="w-12 h-12 rounded-xl bg-violet-600/10 border border-violet-500/20 flex items-center justify-center text-violet-400 font-bold">
                             {reg.companyName[0].toUpperCase()}
@@ -346,7 +354,7 @@ export default function SuperAdminPage() {
                       <div className="flex items-center gap-2 self-end md:self-auto">
                         <button
                           onClick={() => handleReject(reg.id)}
-                          className="px-4 py-2 text-xs font-semibold text-gray-400 hover:text-white bg-white/[0.02] border border-white/[0.08] hover:bg-white/[0.05] rounded-xl transition-all"
+                          className="px-4 py-2 text-xs font-semibold text-gray-400 hover:text-white bg-black/20 backdrop-blur-xl border border-white/[0.08] hover:bg-white/[0.05] rounded-xl transition-all"
                         >
                           Reject
                         </button>
@@ -367,14 +375,14 @@ export default function SuperAdminPage() {
             <h2 className="text-xl font-bold mb-6">Provisioned SaaS Companies</h2>
 
             {companies.length === 0 ? (
-              <div className="glass-panel p-12 text-center rounded-2xl">
+              <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-12 text-center rounded-2xl">
                 <Building2 className="w-12 h-12 text-gray-600 mx-auto mb-4" />
                 <p className="text-gray-400 text-sm">No company subdomains provisioned yet.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {companies.map((comp) => (
-                  <div key={comp.id} className="glass-panel p-6 rounded-2xl flex flex-col justify-between border border-white/[0.05]">
+                  <div key={comp.id} className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl flex flex-col justify-between border border-white/10">
                     <div className="flex justify-between items-start mb-6">
                       <div className="flex gap-3 items-center">
                         <div className="w-10 h-10 bg-violet-600/10 rounded-lg flex items-center justify-center font-bold text-violet-400">

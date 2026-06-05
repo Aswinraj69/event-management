@@ -13,7 +13,7 @@ export default function PublicQuotationPage({ params }: { params: { token: strin
   const sigPad = useRef<any>(null);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/quotations/public/${params.token}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://event-management-production-b372.up.railway.app'}/api/quotations/public/${params.token}`)
       .then(res => {
         if (!res.ok) throw new Error('Quotation not found or link has expired.');
         return res.json();
@@ -47,7 +47,7 @@ export default function PublicQuotationPage({ params }: { params: { token: strin
     const signatureData = sigPad.current.getTrimmedCanvas().toDataURL('image/png');
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/quotations/public/${params.token}/sign`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://event-management-production-b372.up.railway.app'}/api/quotations/public/${params.token}/sign`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ signatureData }),

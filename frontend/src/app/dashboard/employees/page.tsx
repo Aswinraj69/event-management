@@ -40,7 +40,7 @@ export default function EmployeesPage() {
   const fetchEmployees = async () => {
     const token = localStorage.getItem('evento_token');
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/employees`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://event-management-production-b372.up.railway.app'}/api/employees`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -81,7 +81,7 @@ export default function EmployeesPage() {
     };
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/employees`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://event-management-production-b372.up.railway.app'}/api/employees`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -129,7 +129,7 @@ export default function EmployeesPage() {
     if (!confirm('Are you sure you want to suspend this employee?')) return;
     const token = localStorage.getItem('evento_token');
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/employees/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://event-management-production-b372.up.railway.app'}/api/employees/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

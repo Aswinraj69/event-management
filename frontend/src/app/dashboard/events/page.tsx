@@ -1,143 +1,376 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Calendar, MapPin, Clock, UserCheck, UserX, UserPlus, Clipboard, ShieldAlert, BadgeCheck, AlertCircle, X, HelpCircle } from 'lucide-react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import {
+  Calendar, MapPin, Clock, UserPlus, AlertCircle, X, Plus, Search,
+  ChevronUp, ChevronDown, ChevronLeft, ChevronRight, MoreVertical,
+  Eye, Pencil, Trash2, CheckSquare, Square, Filter, Phone, User,
+  DollarSign, FileText, Users, Tag, SlidersHorizontal, Check,
+  UserCheck, UserX, Clipboard, XCircle, Loader2
+} from 'lucide-react';
+
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://event-management-production-b372.up.railway.app';
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+type BookingStatus = 'UPCOMING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+type EventType =
+  | 'WEDDING' | 'ENGAGEMENT' | 'BIRTHDAY' | 'CORPORATE_EVENT'
+  | 'CONFERENCE' | 'PRODUCT_LAUNCH' | 'PRIVATE_EVENT' | 'PHOTOSHOOT'
+  | 'GRADUATION' | 'OTHER';
+
+interface Booking {
+  id: string;
+  title: string;
+  type: EventType;
+  clientId?: string;
+  client?: { id: string; name: string; phone?: string };
+  clientName?: string;
+  clientPhone?: string;
+  venue?: string;
+  googleMapsUrl?: string;
+  eventDate?: string;
+  startTime?: string;
+  endTime?: string;
+  notes?: string;
+  additionalNotes?: string;
+  bookingStatus: BookingStatus;
+  quotationAmount: number;
+  advanceAmount: number;
+  additionalExpenses: number;
+  profit: number;
+  staffAssignments: StaffAssignment[];
+  createdAt: string;
+}
+
+interface StaffAssignment {
+  id: string;
+  role: string;
+  status: 'PENDING' | 'ACCEPTED' | 'DECLINED';
+  user: { id: string; firstName: string; lastName: string; email: string };
+}
+
+interface Employee {
+  id: string;
+  firstName: string;
+  lastName: string;
+  employeeProfile?: { designation?: string };
+}
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const STATUS_CONFIG: Record<BookingStatus, { label: string; cls: string }> = {
+  UPCOMING:  { label: 'Upcoming',  cls: 'bg-blue-500/15 text-blue-400 border border-blue-500/25' },
+  CONFIRMED: { label: 'Confirmed', cls: 'bg-violet-500/15 text-violet-400 border border-violet-500/25' },
+  COMPLETED: { label: 'Completed', cls: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25' },
+  CANCELLED: { label: 'Cancelled', cls: 'bg-red-500/15 text-red-400 border border-red-500/25' },
+};
+
+const EVENT_TYPE_LABELS: Record<EventType, string> = {
+  WEDDING: 'Wedding', ENGAGEMENT: 'Engagement', BIRTHDAY: 'Birthday',
+  CORPORATE_EVENT: 'Corporate Event', CONFERENCE: 'Conference',
+  PRODUCT_LAUNCH: 'Product Launch', PRIVATE_EVENT: 'Private Event',
+  PHOTOSHOOT: 'Photoshoot', GRADUATION: 'Graduation', OTHER: 'Other',
+};
+
+const EMPTY_FORM = {
+  clientId: '', clientName: '', clientPhone: '', title: '', type: 'WEDDING' as EventType,
+  eventDate: '', startTime: '', endTime: '', venue: '', googleMapsUrl: '',
+  quotationAmount: '', advanceAmount: '', additionalExpenses: '',
+  bookingStatus: 'UPCOMING' as BookingStatus, notes: '', additionalNotes: '',
+  assignedStaff: [] as string[],
+};
+
+type SortCol = 'clientName' | 'title' | 'eventDate' | 'bookingStatus' | 'quotationAmount' | 'createdAt';
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function fmtDate(d?: string | null) {
+  if (!d) return '—';
+  try { return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }); }
+  catch { return d; }
+}
+
+function fmtCurrency(n: number | string | undefined) {
+  const num = Number(n ?? 0);
+  return isNaN(num) ? '—' : `AED ${num.toLocaleString('en', { minimumFractionDigits: 0 })}`;
+}
+
+function getClientName(b: Booking) {
+  return b.client?.name || b.clientName || '—';
+}
+function getClientPhone(b: Booking) {
+  return b.client?.phone || b.clientPhone || '—';
+}
+
+// ─── Status Badge ─────────────────────────────────────────────────────────────
+
+function StatusBadge({ status }: { status: BookingStatus }) {
+  const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.UPCOMING;
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide whitespace-nowrap ${cfg.cls}`}>
+      {cfg.label}
+    </span>
+  );
+}
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [clients, setClients] = useState<any[]>([]);
-  const [employees, setEmployees] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any | null>(null);
 
-  // New Event Form
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [formData, setFormData] = useState({
-    title: '',
-    type: 'WEDDING',
-    clientId: '',
-    venue: '',
-    googleMapsUrl: '',
-    eventDate: '',
-    startTime: '14:00',
-    endTime: '22:00',
-    notes: '',
-    quotationAmount: 5000,
-    advanceAmount: 1500,
-    additionalExpenses: 500
-  });
+  // ── Table state
+  const [search, setSearch] = useState('');
+  const [filterStatus, setFilterStatus] = useState<BookingStatus | ''>('');
+  const [filterType, setFilterType] = useState<EventType | ''>('');
+  const [sortCol, setSortCol] = useState<SortCol>('eventDate');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [openActionId, setOpenActionId] = useState<string | null>(null);
+  const actionMenuRef = useRef<HTMLDivElement>(null);
 
-  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+  // ── Drawer state
+  const [showDrawer, setShowDrawer] = useState(false);
+  const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('create');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formData, setFormData] = useState({ ...EMPTY_FORM });
+  const [saving, setSaving] = useState(false);
+
+  // ── View modal
+  const [viewingBooking, setViewingBooking] = useState<Booking | null>(null);
+
+  // ── Delete confirm
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  // ── Staff assignment panel (legacy inline panel)
+  const [selectedEvent, setSelectedEvent] = useState<Booking | null>(null);
+  const [tempAssignments, setTempAssignments] = useState<{ userId: string; role: string }[]>([]);
   const [assignmentError, setAssignmentError] = useState('');
-  const [tempAssignments, setTempAssignments] = useState<any[]>([]); // Array of { userId, role }
 
-  const fetchInitialData = async () => {
-    const token = localStorage.getItem('evento_token');
+  // ─── Fetch ─────────────────────────────────────────────────────────────────
+
+  const token = () => localStorage.getItem('evento_token') ?? '';
+
+  const fetchAll = async () => {
     try {
-      // 1. Fetch Events
-      const evRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://event-management-production-b372.up.railway.app'}/api/events`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (evRes.ok) {
-        const evData = await evRes.json();
-        setEvents(evData);
-      }
+      const evRes = await fetch(`${API}/api/events`, { headers: { Authorization: `Bearer ${token()}` } });
+      if (evRes.ok) setBookings(await evRes.json());
 
-      // 2. Fetch Clients (only if Admin)
       const u = JSON.parse(localStorage.getItem('evento_user') || '{}');
       setUser(u);
 
       if (u.role === 'COMPANY_ADMIN') {
-        const clRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://event-management-production-b372.up.railway.app'}/api/clients`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (clRes.ok) {
-          const clData = await clRes.json();
-          setClients(clData);
-        }
-
-        // 3. Fetch Employees for assignment pool
-        const empRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://event-management-production-b372.up.railway.app'}/api/employees`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (empRes.ok) {
-          const empData = await empRes.json();
-          setEmployees(empData);
-        }
+        const [clRes, empRes] = await Promise.all([
+          fetch(`${API}/api/clients`, { headers: { Authorization: `Bearer ${token()}` } }),
+          fetch(`${API}/api/employees`, { headers: { Authorization: `Bearer ${token()}` } }),
+        ]);
+        if (clRes.ok) setClients(await clRes.json());
+        if (empRes.ok) setEmployees(await empRes.json());
       }
-    } catch (err) {
-      console.error('Error fetching event listings', err);
+    } catch (e) {
+      console.error(e);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => { fetchAll(); }, []);
+
+  // Close action menu on outside click
   useEffect(() => {
-    fetchInitialData();
+    const handler = (e: MouseEvent) => {
+      if (actionMenuRef.current && !actionMenuRef.current.contains(e.target as Node)) {
+        setOpenActionId(null);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: name.includes('Amount') || name.includes('Expenses') ? Number(value) : value
-    }));
+  // ─── Table logic ───────────────────────────────────────────────────────────
+
+  const filtered = useMemo(() => {
+    let rows = [...bookings];
+    if (search) {
+      const q = search.toLowerCase();
+      rows = rows.filter(b =>
+        getClientName(b).toLowerCase().includes(q) ||
+        b.title.toLowerCase().includes(q) ||
+        (b.venue || '').toLowerCase().includes(q) ||
+        getClientPhone(b).toLowerCase().includes(q)
+      );
+    }
+    if (filterStatus) rows = rows.filter(b => b.bookingStatus === filterStatus);
+    if (filterType) rows = rows.filter(b => b.type === filterType);
+
+    rows.sort((a, b) => {
+      let va: any, vb: any;
+      switch (sortCol) {
+        case 'clientName':       va = getClientName(a); vb = getClientName(b); break;
+        case 'title':            va = a.title; vb = b.title; break;
+        case 'eventDate':        va = a.eventDate ?? ''; vb = b.eventDate ?? ''; break;
+        case 'bookingStatus':    va = a.bookingStatus; vb = b.bookingStatus; break;
+        case 'quotationAmount':  va = Number(a.quotationAmount); vb = Number(b.quotationAmount); break;
+        case 'createdAt':        va = a.createdAt; vb = b.createdAt; break;
+      }
+      if (va < vb) return sortDir === 'asc' ? -1 : 1;
+      if (va > vb) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return rows;
+  }, [bookings, search, filterStatus, filterType, sortCol, sortDir]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pageRows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const handleSort = (col: SortCol) => {
+    if (sortCol === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    else { setSortCol(col); setSortDir('asc'); }
+    setPage(1);
   };
 
-  const handleCreateEvent = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const token = localStorage.getItem('evento_token');
+  const SortIcon = ({ col }: { col: SortCol }) =>
+    sortCol === col
+      ? sortDir === 'asc'
+        ? <ChevronUp className="w-3 h-3 ml-1 text-violet-400 inline" />
+        : <ChevronDown className="w-3 h-3 ml-1 text-violet-400 inline" />
+      : <ChevronUp className="w-3 h-3 ml-1 text-gray-600 inline opacity-40" />;
+
+  // ─── Row selection ─────────────────────────────────────────────────────────
+  const toggleRow = (id: string) => setSelected(prev => {
+    const n = new Set(prev);
+    n.has(id) ? n.delete(id) : n.add(id);
+    return n;
+  });
+  const allSelected = pageRows.length > 0 && pageRows.every(r => selected.has(r.id));
+  const toggleAll = () => {
+    if (allSelected) setSelected(prev => { const n = new Set(prev); pageRows.forEach(r => n.delete(r.id)); return n; });
+    else setSelected(prev => { const n = new Set(prev); pageRows.forEach(r => n.add(r.id)); return n; });
+  };
+
+  // ─── Drawer ────────────────────────────────────────────────────────────────
+
+  const openCreate = () => {
+    setFormData({ ...EMPTY_FORM });
+    setEditingId(null);
+    setDrawerMode('create');
+    setShowDrawer(true);
+  };
+
+  const openEdit = (b: Booking) => {
+    setFormData({
+      clientId: b.clientId || '',
+      clientName: b.clientName || b.client?.name || '',
+      clientPhone: b.clientPhone || b.client?.phone || '',
+      title: b.title,
+      type: b.type,
+      eventDate: b.eventDate ? b.eventDate.split('T')[0] : '',
+      startTime: b.startTime || '',
+      endTime: b.endTime || '',
+      venue: b.venue || '',
+      googleMapsUrl: b.googleMapsUrl || '',
+      quotationAmount: b.quotationAmount ? String(b.quotationAmount) : '',
+      advanceAmount: b.advanceAmount ? String(b.advanceAmount) : '',
+      additionalExpenses: b.additionalExpenses ? String(b.additionalExpenses) : '',
+      bookingStatus: b.bookingStatus,
+      notes: b.notes || '',
+      additionalNotes: b.additionalNotes || '',
+      assignedStaff: [],
+    });
+    setEditingId(b.id);
+    setDrawerMode('edit');
+    setShowDrawer(true);
+    setOpenActionId(null);
+  };
+
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://event-management-production-b372.up.railway.app'}/api/events`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
+      const payload: any = {
+        title: formData.title || 'Untitled Booking',
+        type: formData.type,
+        clientId: formData.clientId || undefined,
+        clientName: formData.clientName || undefined,
+        clientPhone: formData.clientPhone || undefined,
+        venue: formData.venue || undefined,
+        googleMapsUrl: formData.googleMapsUrl || undefined,
+        eventDate: formData.eventDate || undefined,
+        startTime: formData.startTime || undefined,
+        endTime: formData.endTime || undefined,
+        notes: formData.notes || undefined,
+        additionalNotes: formData.additionalNotes || undefined,
+        bookingStatus: formData.bookingStatus,
+        quotationAmount: formData.quotationAmount !== '' ? Number(formData.quotationAmount) : undefined,
+        advanceAmount: formData.advanceAmount !== '' ? Number(formData.advanceAmount) : undefined,
+        additionalExpenses: formData.additionalExpenses !== '' ? Number(formData.additionalExpenses) : undefined,
+      };
+
+      const url = drawerMode === 'edit' ? `${API}/api/events/${editingId}` : `${API}/api/events`;
+      const method = drawerMode === 'edit' ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
+        body: JSON.stringify(payload),
       });
+
       if (!res.ok) {
-        alert('Failed to schedule event');
+        const err = await res.json().catch(() => ({}));
+        alert(err.message || 'Failed to save booking');
         return;
       }
-      setShowAddForm(false);
-      fetchInitialData();
-      // Reset form
-      setFormData({
-        title: '',
-        type: 'WEDDING',
-        clientId: '',
-        venue: '',
-        googleMapsUrl: '',
-        eventDate: '',
-        startTime: '14:00',
-        endTime: '22:00',
-        notes: '',
-        quotationAmount: 5000,
-        advanceAmount: 1500,
-        additionalExpenses: 500
-      });
-    } catch (err) {
-      alert('Error scheduling event');
+
+      setShowDrawer(false);
+      await fetchAll();
+    } catch (e) {
+      alert('Network error, please try again');
+    } finally {
+      setSaving(false);
     }
   };
 
-  // Pre-load current assignments in temp states for edits
-  const handleSelectEvent = (event: any) => {
-    setSelectedEvent(event);
-    setAssignmentError('');
-    setTempAssignments(
-      event.staffAssignments.map((a: any) => ({
-        userId: a.user.id,
-        role: a.role
-      }))
-    );
+  // ─── Delete ────────────────────────────────────────────────────────────────
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`${API}/api/events/${deleteId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token()}` },
+      });
+      if (res.ok) {
+        setDeleteId(null);
+        await fetchAll();
+      } else {
+        alert('Failed to delete booking');
+      }
+    } finally {
+      setDeleting(false);
+    }
   };
 
-  // Append or modify a staff role selection
+  // ─── Staff Assignment (legacy feature) ────────────────────────────────────
+
+  const handleSelectEvent = (event: Booking) => {
+    setSelectedEvent(event);
+    setAssignmentError('');
+    setTempAssignments(event.staffAssignments.map((a) => ({ userId: a.user.id, role: a.role })));
+  };
+
   const handleRoleSelection = (role: string, userId: string) => {
     setTempAssignments(prev => {
-      // Remove previous assignee for this specific role
       const filtered = prev.filter(item => item.role !== role);
       if (!userId) return filtered;
       return [...filtered, { userId, role }];
@@ -146,168 +379,682 @@ export default function EventsPage() {
 
   const handleSaveRoster = async () => {
     setAssignmentError('');
-    const token = localStorage.getItem('evento_token');
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://event-management-production-b372.up.railway.app'}/api/events/${selectedEvent.id}/staff`, {
+      const res = await fetch(`${API}/api/events/${selectedEvent!.id}/staff`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ assignments: tempAssignments })
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
+        body: JSON.stringify({ assignments: tempAssignments }),
       });
       const data = await res.json();
-
-      if (!res.ok) {
-        // Display double booking warning returned from backend
-        setAssignmentError(data.message || 'Double booking collision detected');
-        return;
-      }
-
+      if (!res.ok) { setAssignmentError(data.message || 'Double booking collision detected'); return; }
       setSelectedEvent(data);
-      fetchInitialData();
-      alert('Roster updated and notifications dispatched to workers!');
-    } catch (err) {
+      fetchAll();
+      alert('Roster updated and notifications dispatched!');
+    } catch {
       setAssignmentError('Connection issue during assignment review');
     }
   };
 
-  // Staff status updates (Accept / Decline)
   const handleResponse = async (assignmentId: string, nextStatus: 'ACCEPTED' | 'DECLINED') => {
-    const token = localStorage.getItem('evento_token');
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://event-management-production-b372.up.railway.app'}/api/events/assignments/${assignmentId}`, {
+      const res = await fetch(`${API}/api/events/assignments/${assignmentId}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ status: nextStatus })
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
+        body: JSON.stringify({ status: nextStatus }),
       });
-      if (res.ok) {
-        fetchInitialData();
-        setSelectedEvent(null);
-      }
-    } catch (err) {
-      alert('Status update failed');
-    }
+      if (res.ok) { fetchAll(); setSelectedEvent(null); }
+    } catch { alert('Status update failed'); }
   };
 
   const isAdmin = user?.role === 'COMPANY_ADMIN';
 
+  // ─── Stats ─────────────────────────────────────────────────────────────────
+
+  const stats = useMemo(() => ({
+    total: bookings.length,
+    upcoming: bookings.filter(b => b.bookingStatus === 'UPCOMING').length,
+    confirmed: bookings.filter(b => b.bookingStatus === 'CONFIRMED').length,
+    completed: bookings.filter(b => b.bookingStatus === 'COMPLETED').length,
+    revenue: bookings.reduce((s, b) => s + Number(b.quotationAmount || 0), 0),
+  }), [bookings]);
+
+  // ─── Render ────────────────────────────────────────────────────────────────
+
   return (
-    <div className="space-y-8 animate-fade-in relative">
-      <header className="flex justify-between items-center">
+    <div className="space-y-6 animate-fade-in relative">
+
+      {/* ── Header ── */}
+      <header className="flex justify-between items-start gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white">Events Scheduler</h1>
-          <p className="text-gray-400 text-sm mt-1">Configure weddings, corporate campaigns, and dispatch staff.</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-white">Events Manager</h1>
+          <p className="text-gray-400 text-sm mt-1">Manage all bookings, photoshoots, weddings and events.</p>
         </div>
         {isAdmin && (
           <button
-            onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold text-xs rounded-xl shadow-lg transition-all"
+            id="new-booking-btn"
+            onClick={openCreate}
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold text-xs rounded-xl shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-violet-500/30 shrink-0"
           >
-            <Calendar className="w-4 h-4" /> Book Event Campaign
+            <Plus className="w-4 h-4" /> New Booking
           </button>
         )}
       </header>
 
-      {/* Scheduler Dashboard layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        {/* Event cards lists column */}
-        <div className="lg:col-span-2 space-y-4">
-          {loading ? (
-            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-10 text-center text-xs text-gray-500">Loading events...</div>
-          ) : events.length === 0 ? (
-            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-12 text-center text-xs text-gray-500">No scheduled events found.</div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {events.map(event => {
-                // If logged in as staff, highlight assignments
-                const userAssigned = event.staffAssignments.find((a: any) => a.user.id === user?.userId);
-
-                return (
-                  <div
-                    key={event.id}
-                    onClick={() => handleSelectEvent(event)}
-                    className={`glass-panel p-6 rounded-2xl cursor-pointer hover:border-violet-500/30 transition-all ${
-                      selectedEvent?.id === event.id ? 'border-violet-500' : ''
-                    } relative overflow-hidden`}
-                  >
-                    {userAssigned && (
-                      <div className="absolute top-0 right-0 bg-violet-600/20 border-b border-l border-violet-500/30 px-3 py-1 rounded-bl-xl text-[9px] font-bold text-violet-400">
-                        My Assignment: {userAssigned.role} ({userAssigned.status})
-                      </div>
-                    )}
-                    <span className="text-[10px] text-violet-400 font-bold tracking-widest uppercase">{event.type}</span>
-                    <h3 className="text-md font-bold text-white mt-1.5 truncate">{event.title}</h3>
-                    <p className="text-xs text-gray-500 mt-1">{event.client?.name}</p>
-
-                    <div className="mt-4 pt-4 border-t border-white/[0.04] space-y-2 text-xs text-gray-400">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-3.5 h-3.5 text-gray-500" />
-                        <span>{new Date(event.eventDate).toISOString().split('T')[0]}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-3.5 h-3.5 text-gray-500" />
-                        <span>{event.startTime} - {event.endTime}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-3.5 h-3.5 text-gray-500" />
-                        <span className="truncate max-w-[200px]">{event.venue}</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+      {/* ── Stats Row ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        {[
+          { label: 'Total Bookings', value: stats.total, icon: Calendar, color: 'text-violet-400' },
+          { label: 'Upcoming', value: stats.upcoming, icon: Clock, color: 'text-blue-400' },
+          { label: 'Confirmed', value: stats.confirmed, icon: Check, color: 'text-violet-400' },
+          { label: 'Completed', value: stats.completed, icon: CheckSquare, color: 'text-emerald-400' },
+          { label: 'Total Revenue', value: `AED ${stats.revenue.toLocaleString()}`, icon: DollarSign, color: 'text-emerald-400' },
+        ].map(({ label, value, icon: Icon, color }) => (
+          <div key={label} className="glass-panel rounded-xl p-4 flex items-center gap-3">
+            <div className={`p-2 rounded-lg bg-white/[0.04] ${color}`}>
+              <Icon className="w-4 h-4" />
             </div>
-          )}
+            <div>
+              <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">{label}</p>
+              <p className="text-lg font-bold text-white leading-tight">{value}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Table Card ── */}
+      <div className="glass-panel rounded-2xl overflow-hidden">
+
+        {/* Table toolbar */}
+        <div className="p-4 border-b border-white/[0.06] flex flex-wrap gap-3 items-center">
+          {/* Search */}
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+            <input
+              id="booking-search"
+              type="text"
+              placeholder="Search client, event, location..."
+              value={search}
+              onChange={e => { setSearch(e.target.value); setPage(1); }}
+              className="w-full pl-9 pr-3 py-2 bg-black/30 border border-white/[0.08] rounded-xl text-xs text-white placeholder-gray-600 focus:outline-none focus:border-violet-500/50 focus:bg-violet-500/5 transition-all"
+            />
+          </div>
+
+          {/* Status filter */}
+          <div className="relative">
+            <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-500 pointer-events-none" />
+            <select
+              value={filterStatus}
+              onChange={e => { setFilterStatus(e.target.value as any); setPage(1); }}
+              className="pl-7 pr-6 py-2 bg-black/30 border border-white/[0.08] rounded-xl text-xs text-gray-400 focus:outline-none focus:border-violet-500/50 transition-all appearance-none cursor-pointer"
+            >
+              <option value="">All Statuses</option>
+              {(Object.keys(STATUS_CONFIG) as BookingStatus[]).map(s => (
+                <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Type filter */}
+          <div className="relative">
+            <Tag className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-500 pointer-events-none" />
+            <select
+              value={filterType}
+              onChange={e => { setFilterType(e.target.value as any); setPage(1); }}
+              className="pl-7 pr-6 py-2 bg-black/30 border border-white/[0.08] rounded-xl text-xs text-gray-400 focus:outline-none focus:border-violet-500/50 transition-all appearance-none cursor-pointer"
+            >
+              <option value="">All Types</option>
+              {(Object.keys(EVENT_TYPE_LABELS) as EventType[]).map(t => (
+                <option key={t} value={t}>{EVENT_TYPE_LABELS[t]}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Result count */}
+          <span className="text-[11px] text-gray-600 ml-auto whitespace-nowrap">
+            {filtered.length} result{filtered.length !== 1 ? 's' : ''}
+          </span>
         </div>
 
-        {/* Detailed details inspector / assignment tools column */}
-        <div>
-          {selectedEvent ? (
-            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl animate-fade-in space-y-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <span className="text-[9px] font-bold bg-violet-600/10 border border-violet-500/20 text-violet-400 px-2 py-0.5 rounded-md uppercase">
-                    {selectedEvent.type}
-                  </span>
-                  <h3 className="font-bold text-white text-md mt-2 leading-tight">{selectedEvent.title}</h3>
-                </div>
-                <button onClick={() => setSelectedEvent(null)} className="text-gray-500 hover:text-white">
-                  <X className="w-4 h-4" />
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-white/[0.06]">
+                <th className="pl-4 py-3 w-10">
+                  <button onClick={toggleAll} className="text-gray-500 hover:text-white transition-colors">
+                    {allSelected ? <CheckSquare className="w-3.5 h-3.5 text-violet-400" /> : <Square className="w-3.5 h-3.5" />}
+                  </button>
+                </th>
+                {([
+                  ['clientName', 'Client'],
+                  ['title', 'Event'],
+                ] as [SortCol, string][]).map(([col, label]) => (
+                  <th key={col} className="px-3 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-white transition-colors whitespace-nowrap" onClick={() => handleSort(col)}>
+                    {label}<SortIcon col={col} />
+                  </th>
+                ))}
+                <th className="px-3 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">Phone</th>
+                <th className="px-3 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">Type</th>
+                <th className="px-3 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-white transition-colors whitespace-nowrap" onClick={() => handleSort('eventDate')}>
+                  Date<SortIcon col="eventDate" />
+                </th>
+                <th className="px-3 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">Time</th>
+                <th className="px-3 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">Location</th>
+                <th className="px-3 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-white transition-colors whitespace-nowrap" onClick={() => handleSort('quotationAmount')}>
+                  Amount<SortIcon col="quotationAmount" />
+                </th>
+                <th className="px-3 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">Advance</th>
+                <th className="px-3 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">Staff</th>
+                <th className="px-3 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-white transition-colors whitespace-nowrap" onClick={() => handleSort('bookingStatus')}>
+                  Status<SortIcon col="bookingStatus" />
+                </th>
+                <th className="px-3 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-white transition-colors whitespace-nowrap" onClick={() => handleSort('createdAt')}>
+                  Created<SortIcon col="createdAt" />
+                </th>
+                <th className="px-4 py-3 text-center font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap sticky right-0 bg-[#0a0a12]">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={14} className="py-20 text-center">
+                    <Loader2 className="w-6 h-6 text-violet-500 animate-spin mx-auto" />
+                    <p className="text-gray-600 text-xs mt-3">Loading bookings...</p>
+                  </td>
+                </tr>
+              ) : pageRows.length === 0 ? (
+                <tr>
+                  <td colSpan={14} className="py-20 text-center">
+                    <Calendar className="w-8 h-8 text-gray-700 mx-auto mb-3" />
+                    <p className="text-gray-500 text-sm font-medium">No bookings found</p>
+                    <p className="text-gray-700 text-xs mt-1">
+                      {search || filterStatus || filterType ? 'Try adjusting your filters' : 'Click "New Booking" to get started'}
+                    </p>
+                    {isAdmin && !search && !filterStatus && !filterType && (
+                      <button onClick={openCreate} className="mt-4 px-4 py-2 bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 text-violet-400 text-xs font-semibold rounded-xl transition-all">
+                        + New Booking
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ) : pageRows.map((b, idx) => (
+                <tr
+                  key={b.id}
+                  className={`border-b border-white/[0.04] transition-colors hover:bg-white/[0.02] ${selected.has(b.id) ? 'bg-violet-500/5' : ''}`}
+                >
+                  <td className="pl-4 py-3.5">
+                    <button onClick={() => toggleRow(b.id)} className="text-gray-500 hover:text-violet-400 transition-colors">
+                      {selected.has(b.id) ? <CheckSquare className="w-3.5 h-3.5 text-violet-400" /> : <Square className="w-3.5 h-3.5" />}
+                    </button>
+                  </td>
+                  <td className="px-3 py-3.5">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-[10px] font-bold text-violet-400 shrink-0">
+                        {(getClientName(b)[0] || '?').toUpperCase()}
+                      </div>
+                      <span className="font-medium text-white whitespace-nowrap">{getClientName(b)}</span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-3.5">
+                    <span className="text-gray-300 font-medium whitespace-nowrap max-w-[160px] truncate block">{b.title}</span>
+                  </td>
+                  <td className="px-3 py-3.5 text-gray-400 whitespace-nowrap">{getClientPhone(b)}</td>
+                  <td className="px-3 py-3.5">
+                    <span className="text-[10px] text-gray-500 bg-white/[0.04] px-2 py-0.5 rounded-md whitespace-nowrap">
+                      {EVENT_TYPE_LABELS[b.type] || b.type}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3.5 text-gray-400 whitespace-nowrap">{fmtDate(b.eventDate)}</td>
+                  <td className="px-3 py-3.5 text-gray-400 whitespace-nowrap">
+                    {b.startTime && b.endTime ? `${b.startTime} – ${b.endTime}` : b.startTime || b.endTime || '—'}
+                  </td>
+                  <td className="px-3 py-3.5">
+                    <span className="text-gray-400 truncate block max-w-[140px]" title={b.venue}>{b.venue || '—'}</span>
+                  </td>
+                  <td className="px-3 py-3.5 text-white font-medium whitespace-nowrap">{fmtCurrency(b.quotationAmount)}</td>
+                  <td className="px-3 py-3.5 text-emerald-400 whitespace-nowrap">{fmtCurrency(b.advanceAmount)}</td>
+                  <td className="px-3 py-3.5">
+                    {b.staffAssignments.length > 0 ? (
+                      <div className="flex -space-x-1.5">
+                        {b.staffAssignments.slice(0, 3).map(a => (
+                          <div key={a.id} title={`${a.user.firstName} ${a.user.lastName} (${a.role})`}
+                            className="w-6 h-6 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-[8px] font-bold text-indigo-300">
+                            {a.user.firstName[0]}{a.user.lastName[0]}
+                          </div>
+                        ))}
+                        {b.staffAssignments.length > 3 && (
+                          <div className="w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-[8px] font-bold text-gray-400">
+                            +{b.staffAssignments.length - 3}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-gray-700 text-[10px]">Unassigned</span>
+                    )}
+                  </td>
+                  <td className="px-3 py-3.5"><StatusBadge status={b.bookingStatus} /></td>
+                  <td className="px-3 py-3.5 text-gray-600 whitespace-nowrap">{fmtDate(b.createdAt)}</td>
+                  <td className="px-4 py-3.5 sticky right-0 bg-[#0a0a12]">
+                    <div className="relative flex justify-center" ref={openActionId === b.id ? actionMenuRef : undefined}>
+                      <button
+                        id={`action-menu-${b.id}`}
+                        onClick={() => setOpenActionId(openActionId === b.id ? null : b.id)}
+                        className="p-1.5 rounded-lg hover:bg-white/10 text-gray-500 hover:text-white transition-all"
+                      >
+                        <MoreVertical className="w-3.5 h-3.5" />
+                      </button>
+                      {openActionId === b.id && (
+                        <div className="absolute right-0 top-8 z-50 bg-[#131320] border border-white/10 rounded-xl shadow-2xl py-1 min-w-[140px] animate-fade-in">
+                          <button
+                            onClick={() => { setViewingBooking(b); setOpenActionId(null); }}
+                            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-gray-300 hover:bg-white/[0.06] hover:text-white transition-colors"
+                          >
+                            <Eye className="w-3.5 h-3.5 text-blue-400" /> View Details
+                          </button>
+                          {isAdmin && (
+                            <>
+                              <button
+                                onClick={() => openEdit(b)}
+                                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-gray-300 hover:bg-white/[0.06] hover:text-white transition-colors"
+                              >
+                                <Pencil className="w-3.5 h-3.5 text-violet-400" /> Edit Booking
+                              </button>
+                              <button
+                                onClick={() => { handleSelectEvent(b); setOpenActionId(null); }}
+                                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-gray-300 hover:bg-white/[0.06] hover:text-white transition-colors"
+                              >
+                                <Users className="w-3.5 h-3.5 text-indigo-400" /> Assign Staff
+                              </button>
+                              <div className="border-t border-white/[0.06] mt-1 mb-1" />
+                              <button
+                                onClick={() => { setDeleteId(b.id); setOpenActionId(null); }}
+                                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-red-400 hover:bg-red-500/10 transition-colors"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" /> Delete
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="px-4 py-3 border-t border-white/[0.06] flex items-center justify-between gap-4">
+          <p className="text-[11px] text-gray-600">
+            Showing {Math.min((page - 1) * PAGE_SIZE + 1, filtered.length)}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="p-1.5 rounded-lg border border-white/[0.08] text-gray-500 hover:text-white hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+            {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+              let p: number;
+              if (totalPages <= 7) p = i + 1;
+              else if (page <= 4) p = i + 1;
+              else if (page >= totalPages - 3) p = totalPages - 6 + i;
+              else p = page - 3 + i;
+              return (
+                <button key={p} onClick={() => setPage(p)}
+                  className={`w-7 h-7 rounded-lg text-[11px] font-medium transition-all ${page === p ? 'bg-violet-600 text-white' : 'text-gray-500 hover:text-white hover:bg-white/[0.06]'}`}>
+                  {p}
                 </button>
+              );
+            })}
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="p-1.5 rounded-lg border border-white/[0.08] text-gray-500 hover:text-white hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════
+          BOOKING DRAWER
+          ═══════════════════════════════════════════════════════ */}
+      {showDrawer && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 animate-fade-in"
+            onClick={() => !saving && setShowDrawer(false)}
+          />
+          {/* Drawer */}
+          <div className="fixed top-0 right-0 h-full w-full max-w-xl bg-[#0d0d1a] border-l border-white/[0.08] shadow-2xl z-50 flex flex-col"
+            style={{ animation: 'slideInRight 0.3s cubic-bezier(0.16,1,0.3,1)' }}>
+
+            {/* Drawer header */}
+            <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.08] shrink-0">
+              <div>
+                <h2 className="text-lg font-bold text-white">
+                  {drawerMode === 'create' ? 'New Booking' : 'Edit Booking'}
+                </h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {drawerMode === 'create' ? 'Create a new event booking record' : 'Update booking details'}
+                </p>
+              </div>
+              <button onClick={() => !saving && setShowDrawer(false)} className="p-2 rounded-lg hover:bg-white/10 text-gray-500 hover:text-white transition-all">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Drawer body */}
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+
+              {/* Section: Client Info */}
+              <Section title="Client Information" icon={<User className="w-3.5 h-3.5" />}>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Client Name">
+                    {clients.length > 0 ? (
+                      <select name="clientId" value={formData.clientId} onChange={handleFormChange} className="form-field">
+                        <option value="">— Manual entry —</option>
+                        {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                    ) : (
+                      <input type="text" name="clientName" placeholder="e.g. John & Sarah" value={formData.clientName} onChange={handleFormChange} className="form-field" />
+                    )}
+                  </Field>
+                  <Field label="Phone Number">
+                    <input type="tel" name="clientPhone" placeholder="+971 50 000 0000" value={formData.clientPhone} onChange={handleFormChange} className="form-field" />
+                  </Field>
+                  {/* If a linked client selected but also want to override name */}
+                  {formData.clientId && clients.length > 0 && (
+                    <Field label="Override Name (optional)" className="col-span-2">
+                      <input type="text" name="clientName" placeholder="Leave blank to use client record name" value={formData.clientName} onChange={handleFormChange} className="form-field" />
+                    </Field>
+                  )}
+                </div>
+              </Section>
+
+              {/* Section: Event Info */}
+              <Section title="Event Details" icon={<Calendar className="w-3.5 h-3.5" />}>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Event Name / Title" className="col-span-2">
+                    <input type="text" name="title" placeholder="e.g. Ahmad & Fatima Wedding" value={formData.title} onChange={handleFormChange} className="form-field" />
+                  </Field>
+                  <Field label="Event Type">
+                    <select name="type" value={formData.type} onChange={handleFormChange} className="form-field">
+                      {(Object.keys(EVENT_TYPE_LABELS) as EventType[]).map(t => (
+                        <option key={t} value={t}>{EVENT_TYPE_LABELS[t]}</option>
+                      ))}
+                    </select>
+                  </Field>
+                  <Field label="Booking Status">
+                    <select name="bookingStatus" value={formData.bookingStatus} onChange={handleFormChange} className="form-field">
+                      <option value="UPCOMING">Upcoming</option>
+                      <option value="CONFIRMED">Confirmed</option>
+                      <option value="COMPLETED">Completed</option>
+                      <option value="CANCELLED">Cancelled</option>
+                    </select>
+                  </Field>
+                  <Field label="Event Date">
+                    <input type="date" name="eventDate" value={formData.eventDate} onChange={handleFormChange} className="form-field" />
+                  </Field>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Field label="Start Time">
+                      <input type="time" name="startTime" value={formData.startTime} onChange={handleFormChange} className="form-field" />
+                    </Field>
+                    <Field label="End Time">
+                      <input type="time" name="endTime" value={formData.endTime} onChange={handleFormChange} className="form-field" />
+                    </Field>
+                  </div>
+                </div>
+              </Section>
+
+              {/* Section: Location */}
+              <Section title="Location" icon={<MapPin className="w-3.5 h-3.5" />}>
+                <div className="grid grid-cols-1 gap-3">
+                  <Field label="Event Location / Venue">
+                    <input type="text" name="venue" placeholder="e.g. Armani Hotel, Dubai" value={formData.venue} onChange={handleFormChange} className="form-field" />
+                  </Field>
+                  <Field label="Google Maps URL (optional)">
+                    <input type="url" name="googleMapsUrl" placeholder="https://maps.google.com/..." value={formData.googleMapsUrl} onChange={handleFormChange} className="form-field" />
+                  </Field>
+                </div>
+              </Section>
+
+              {/* Section: Financials */}
+              <Section title="Financials" icon={<DollarSign className="w-3.5 h-3.5" />}>
+                <div className="grid grid-cols-3 gap-3">
+                  <Field label="Total Amount (AED)">
+                    <input type="number" name="quotationAmount" placeholder="0" min="0" value={formData.quotationAmount} onChange={handleFormChange} className="form-field" />
+                  </Field>
+                  <Field label="Advance (AED)">
+                    <input type="number" name="advanceAmount" placeholder="0" min="0" value={formData.advanceAmount} onChange={handleFormChange} className="form-field" />
+                  </Field>
+                  <Field label="Add. Expenses (AED)">
+                    <input type="number" name="additionalExpenses" placeholder="0" min="0" value={formData.additionalExpenses} onChange={handleFormChange} className="form-field" />
+                  </Field>
+                </div>
+                {(formData.quotationAmount || formData.advanceAmount) && (
+                  <div className="mt-3 p-3 bg-black/30 rounded-xl border border-white/[0.05] text-xs flex justify-between">
+                    <span className="text-gray-500">Balance Due</span>
+                    <span className="text-amber-400 font-bold">
+                      AED {Math.max(0, Number(formData.quotationAmount || 0) - Number(formData.advanceAmount || 0)).toLocaleString()}
+                    </span>
+                  </div>
+                )}
+              </Section>
+
+              {/* Section: Notes */}
+              <Section title="Notes & Remarks" icon={<FileText className="w-3.5 h-3.5" />}>
+                <div className="space-y-3">
+                  <Field label="Notes / Remarks">
+                    <textarea name="notes" rows={3} placeholder="Shoot requirements, special requests, style preferences..." value={formData.notes} onChange={handleFormChange} className="form-field resize-none" />
+                  </Field>
+                  <Field label="Additional Custom Notes">
+                    <textarea name="additionalNotes" rows={3} placeholder="Internal notes, follow-up reminders, special instructions..." value={formData.additionalNotes} onChange={handleFormChange} className="form-field resize-none" />
+                  </Field>
+                </div>
+              </Section>
+
+            </div>
+
+            {/* Drawer footer */}
+            <div className="px-6 py-4 border-t border-white/[0.08] flex items-center justify-end gap-3 shrink-0">
+              <button onClick={() => !saving && setShowDrawer(false)} className="px-4 py-2.5 border border-white/[0.08] text-xs font-semibold rounded-xl text-gray-400 hover:text-white hover:border-white/20 transition-all">
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold text-xs rounded-xl shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                {saving ? 'Saving...' : drawerMode === 'create' ? 'Create Booking' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════
+          VIEW MODAL
+          ═══════════════════════════════════════════════════════ */}
+      {viewingBooking && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-[#0d0d1a] border border-white/[0.08] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative">
+            <div className="sticky top-0 bg-[#0d0d1a] flex items-center justify-between px-6 py-5 border-b border-white/[0.08] z-10">
+              <div className="flex items-center gap-3">
+                <div>
+                  <h2 className="text-lg font-bold text-white leading-tight">{viewingBooking.title}</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">{EVENT_TYPE_LABELS[viewingBooking.type]}</p>
+                </div>
+                <StatusBadge status={viewingBooking.bookingStatus} />
+              </div>
+              <button onClick={() => setViewingBooking(null)} className="p-2 rounded-lg hover:bg-white/10 text-gray-500 hover:text-white transition-all">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Client row */}
+              <div className="grid grid-cols-2 gap-4">
+                <InfoCard icon={<User className="w-4 h-4" />} label="Client" value={getClientName(viewingBooking)} />
+                <InfoCard icon={<Phone className="w-4 h-4" />} label="Phone" value={getClientPhone(viewingBooking)} />
               </div>
 
-              {/* Roster Assignment panel - Admin Mode */}
+              {/* Event row */}
+              <div className="grid grid-cols-3 gap-4">
+                <InfoCard icon={<Calendar className="w-4 h-4" />} label="Event Date" value={fmtDate(viewingBooking.eventDate)} />
+                <InfoCard icon={<Clock className="w-4 h-4" />} label="Start Time" value={viewingBooking.startTime || '—'} />
+                <InfoCard icon={<Clock className="w-4 h-4" />} label="End Time" value={viewingBooking.endTime || '—'} />
+              </div>
+
+              {/* Location */}
+              <InfoCard icon={<MapPin className="w-4 h-4" />} label="Venue / Location" value={viewingBooking.venue || '—'}>
+                {viewingBooking.googleMapsUrl && (
+                  <a href={viewingBooking.googleMapsUrl} target="_blank" rel="noreferrer" className="text-[10px] text-violet-400 hover:underline mt-1 block">
+                    Open in Maps →
+                  </a>
+                )}
+              </InfoCard>
+
+              {/* Financials */}
+              <div className="bg-black/30 rounded-xl border border-white/[0.05] p-4 space-y-2.5">
+                <h4 className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-3 flex items-center gap-1.5">
+                  <DollarSign className="w-3.5 h-3.5" /> Financial Summary
+                </h4>
+                {[
+                  { label: 'Total Amount', value: fmtCurrency(viewingBooking.quotationAmount), cls: 'text-white' },
+                  { label: 'Advance Received', value: fmtCurrency(viewingBooking.advanceAmount), cls: 'text-emerald-400' },
+                  { label: 'Additional Expenses', value: fmtCurrency(viewingBooking.additionalExpenses), cls: 'text-amber-400' },
+                ].map(({ label, value, cls }) => (
+                  <div key={label} className="flex justify-between text-xs">
+                    <span className="text-gray-500">{label}</span>
+                    <span className={`font-semibold ${cls}`}>{value}</span>
+                  </div>
+                ))}
+                <div className="border-t border-white/[0.06] pt-2.5 flex justify-between text-xs">
+                  <span className="text-gray-400 font-semibold">Balance Due</span>
+                  <span className="font-bold text-amber-300">
+                    {fmtCurrency(Math.max(0, Number(viewingBooking.quotationAmount) - Number(viewingBooking.advanceAmount)))}
+                  </span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-400 font-semibold">Net Profit</span>
+                  <span className="font-bold text-emerald-400">{fmtCurrency(viewingBooking.profit)}</span>
+                </div>
+              </div>
+
+              {/* Staff */}
+              {viewingBooking.staffAssignments.length > 0 && (
+                <div>
+                  <h4 className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-3 flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5" /> Assigned Staff
+                  </h4>
+                  <div className="space-y-2">
+                    {viewingBooking.staffAssignments.map(a => (
+                      <div key={a.id} className="flex justify-between items-center bg-black/20 p-3 rounded-xl border border-white/[0.04]">
+                        <div>
+                          <p className="text-xs font-semibold text-white">{a.user.firstName} {a.user.lastName}</p>
+                          <p className="text-[10px] text-gray-500">{a.role}</p>
+                        </div>
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${a.status === 'ACCEPTED' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : a.status === 'DECLINED' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}`}>
+                          {a.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Notes */}
+              {(viewingBooking.notes || viewingBooking.additionalNotes) && (
+                <div className="space-y-3">
+                  {viewingBooking.notes && (
+                    <div>
+                      <h4 className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-2">Notes</h4>
+                      <p className="text-xs text-gray-400 bg-black/20 p-3 rounded-xl border border-white/[0.04] leading-relaxed">{viewingBooking.notes}</p>
+                    </div>
+                  )}
+                  {viewingBooking.additionalNotes && (
+                    <div>
+                      <h4 className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-2">Additional Notes</h4>
+                      <p className="text-xs text-gray-400 bg-black/20 p-3 rounded-xl border border-white/[0.04] leading-relaxed">{viewingBooking.additionalNotes}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Created */}
+              <p className="text-[11px] text-gray-700">
+                Created {fmtDate(viewingBooking.createdAt)} &nbsp;·&nbsp; ID: <span className="font-mono text-gray-600">{viewingBooking.id.slice(0, 8)}…</span>
+              </p>
+            </div>
+
+            <div className="px-6 pb-6 flex justify-end gap-3">
+              {isAdmin && (
+                <button
+                  onClick={() => { setViewingBooking(null); openEdit(viewingBooking); }}
+                  className="flex items-center gap-2 px-4 py-2.5 border border-violet-500/30 text-violet-400 hover:bg-violet-500/10 text-xs font-semibold rounded-xl transition-all"
+                >
+                  <Pencil className="w-3.5 h-3.5" /> Edit Booking
+                </button>
+              )}
+              <button onClick={() => setViewingBooking(null)} className="px-4 py-2.5 bg-white/[0.06] hover:bg-white/[0.10] text-white text-xs font-semibold rounded-xl transition-all">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════
+          STAFF ASSIGNMENT PANEL (slide-in from bottom, existing feature)
+          ═══════════════════════════════════════════════════════ */}
+      {selectedEvent && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-[#0d0d1a] border border-white/[0.08] rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-start justify-between px-6 py-5 border-b border-white/[0.08]">
+              <div>
+                <span className="text-[9px] font-bold bg-violet-600/10 border border-violet-500/20 text-violet-400 px-2 py-0.5 rounded-md uppercase">
+                  {selectedEvent.type}
+                </span>
+                <h3 className="font-bold text-white text-base mt-2">{selectedEvent.title}</h3>
+                <p className="text-xs text-gray-500 mt-0.5">{fmtDate(selectedEvent.eventDate)}</p>
+              </div>
+              <button onClick={() => setSelectedEvent(null)} className="p-2 rounded-lg hover:bg-white/10 text-gray-500 hover:text-white transition-all">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
               {isAdmin ? (
-                <div className="space-y-4 border-t border-white/10 pt-4 text-xs">
+                <>
                   <div className="flex justify-between items-center">
-                    <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider"> Roster Allocation</h4>
-                    <span className="text-[9px] text-gray-400">Double booking guarded</span>
+                    <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Roster Allocation</h4>
+                    <span className="text-[9px] text-gray-600">Double booking protected</span>
                   </div>
 
                   {assignmentError && (
-                    <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-semibold flex gap-1.5 items-start">
-                      <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                      <span>{assignmentError}</span>
+                    <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-semibold flex gap-2 items-start">
+                      <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />{assignmentError}
                     </div>
                   )}
 
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     {['Photographer', 'Videographer', 'Drone Operator', 'Editor', 'Coordinator'].map(role => {
                       const currentAssignee = tempAssignments.find(item => item.role === role);
                       const fullStaffRecord = selectedEvent.staffAssignments.find((a: any) => a.role === role);
-
                       return (
-                        <div key={role} className="flex flex-col gap-1.5 bg-black/20 p-2.5 rounded-xl border border-white/[0.03]">
-                          <div className="flex justify-between items-center">
-                            <span className="font-bold text-gray-400 text-[10px]">{role}</span>
+                        <div key={role} className="bg-black/20 p-3 rounded-xl border border-white/[0.04]">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-[10px] font-bold text-gray-400">{role}</span>
                             {fullStaffRecord && (
-                              <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${
-                                fullStaffRecord.status === 'ACCEPTED' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
-                              }`}>
+                              <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full ${fullStaffRecord.status === 'ACCEPTED' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
                                 {fullStaffRecord.status}
                               </span>
                             )}
@@ -315,7 +1062,7 @@ export default function EventsPage() {
                           <select
                             value={currentAssignee?.userId || ''}
                             onChange={e => handleRoleSelection(role, e.target.value)}
-                            className="w-full bg-black/40 border border-white/[0.08] text-xs text-gray-300 rounded-lg py-1 px-2 focus:outline-none"
+                            className="w-full bg-black/40 border border-white/[0.08] text-xs text-gray-300 rounded-lg py-1.5 px-2 focus:outline-none focus:border-violet-500/40"
                           >
                             <option value="">Unassigned</option>
                             {employees.map(emp => (
@@ -331,199 +1078,146 @@ export default function EventsPage() {
 
                   <button
                     onClick={handleSaveRoster}
-                    className="w-full py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl text-xs shadow transition-all flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl text-xs shadow transition-all flex items-center justify-center gap-2"
                   >
                     <UserPlus className="w-4 h-4" /> Save & Notify Crew
                   </button>
-                </div>
+                </>
               ) : (
-                /* Staff member viewing panel */
-                <div className="space-y-4 border-t border-white/10 pt-4 text-xs">
-                  <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Crew assignments</h4>
-                  <div className="space-y-2">
-                    {selectedEvent.staffAssignments.map((a: any) => (
-                      <div key={a.id} className="flex justify-between items-center bg-black/20 p-3 border border-white/[0.04] rounded-xl">
-                        <div>
-                          <p className="font-semibold text-white">{a.user.firstName} {a.user.lastName}</p>
-                          <span className="text-[10px] text-gray-500">{a.role}</span>
-                        </div>
-                        <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${
-                          a.status === 'ACCEPTED' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
-                        }`}>
-                          {a.status}
-                        </span>
+                <div className="space-y-3">
+                  <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Crew Assignments</h4>
+                  {selectedEvent.staffAssignments.map((a: StaffAssignment) => (
+                    <div key={a.id} className="flex justify-between items-center bg-black/20 p-3 border border-white/[0.04] rounded-xl">
+                      <div>
+                        <p className="text-xs font-semibold text-white">{a.user.firstName} {a.user.lastName}</p>
+                        <span className="text-[10px] text-gray-500">{a.role}</span>
                       </div>
-                    ))}
-                  </div>
-
-                  {/* Accept/Decline options if user is currently assigned and pending */}
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${a.status === 'ACCEPTED' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
+                        {a.status}
+                      </span>
+                    </div>
+                  ))}
                   {(() => {
                     const myAssign = selectedEvent.staffAssignments.find((a: any) => a.user.id === user?.userId);
-                    if (myAssign && myAssign.status === 'PENDING') {
-                      return (
-                        <div className="pt-4 border-t border-white/10 space-y-2">
-                          <p className="text-[10px] font-bold text-violet-400 flex items-center gap-1">
-                            <AlertCircle className="w-3.5 h-3.5" /> Action Required: Confirm Availability
-                          </p>
-                          <div className="grid grid-cols-2 gap-2">
-                            <button
-                              onClick={() => handleResponse(myAssign.id, 'DECLINED')}
-                              className="flex items-center justify-center gap-1 py-2 bg-red-500/5 hover:bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold rounded-lg transition-all"
-                            >
-                              <UserX className="w-3.5 h-3.5" /> Decline
-                            </button>
-                            <button
-                              onClick={() => handleResponse(myAssign.id, 'ACCEPTED')}
-                              className="flex items-center justify-center gap-1 py-2 bg-emerald-500/5 hover:bg-emerald-600/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-lg transition-all"
-                            >
-                              <UserCheck className="w-3.5 h-3.5" /> Accept
-                            </button>
-                          </div>
+                    if (myAssign && myAssign.status === 'PENDING') return (
+                      <div className="pt-3 border-t border-white/10 space-y-2">
+                        <p className="text-[10px] font-bold text-violet-400 flex items-center gap-1">
+                          <AlertCircle className="w-3.5 h-3.5" /> Action Required: Confirm Availability
+                        </p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button onClick={() => handleResponse(myAssign.id, 'DECLINED')}
+                            className="flex items-center justify-center gap-1.5 py-2 bg-red-500/5 hover:bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold rounded-xl transition-all">
+                            <UserX className="w-3.5 h-3.5" /> Decline
+                          </button>
+                          <button onClick={() => handleResponse(myAssign.id, 'ACCEPTED')}
+                            className="flex items-center justify-center gap-1.5 py-2 bg-emerald-500/5 hover:bg-emerald-600/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-xl transition-all">
+                            <UserCheck className="w-3.5 h-3.5" /> Accept
+                          </button>
                         </div>
-                      );
-                    }
+                      </div>
+                    );
                     return null;
                   })()}
                 </div>
               )}
-
-              {/* Financial cards parameters for administrators */}
-              {isAdmin && (
-                <div className="space-y-3 border-t border-white/10 pt-4 text-xs">
-                  <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
-                    <Clipboard className="w-3.5 h-3.5" /> Project Budget ledger
-                  </h4>
-                  <div className="bg-black/30 p-3 rounded-xl border border-white/[0.04] space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Quotation value</span>
-                      <span className="text-white font-medium">AED {Number(selectedEvent.quotationAmount).toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Advance Deposit</span>
-                      <span className="text-white font-medium">AED {Number(selectedEvent.advanceAmount).toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between border-t border-white/[0.04] pt-2">
-                      <span className="text-gray-500">Additional Expenses</span>
-                      <span className="text-white font-medium">AED {Number(selectedEvent.additionalExpenses).toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between border-t border-white/10 pt-2 font-bold">
-                      <span className="text-gray-400">Net Estimated Profit</span>
-                      <span className="text-emerald-400">AED {Number(selectedEvent.profit).toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
-          ) : (
-            <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-8 text-center rounded-2xl text-xs text-gray-500 border-dashed">
-              Select an event card to schedule crew roster, manage double bookings, and check budget logs.
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Book Event Dialog Form */}
-      {showAddForm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50 animate-fade-in">
-          <div className="bg-[#0f0f13] border border-white/[0.08] rounded-2xl max-w-2xl w-full p-8 max-h-[85vh] overflow-y-auto shadow-2xl relative">
-            <button onClick={() => setShowAddForm(false)} className="absolute right-6 top-6 text-gray-500 hover:text-white">
-              <X className="w-5 h-5" />
-            </button>
-            <div className="mb-6">
-              <h3 className="text-xl font-bold">Book Event Campaign</h3>
-              <p className="text-xs text-gray-500 mt-1">Create schedule details and record client values.</p>
-            </div>
-
-            <form onSubmit={handleCreateEvent} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Event Title</label>
-                  <input type="text" name="title" required value={formData.title} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Event Type</label>
-                  <select name="type" value={formData.type} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400">
-                    <option value="WEDDING">Wedding</option>
-                    <option value="ENGAGEMENT">Engagement</option>
-                    <option value="BIRTHDAY">Birthday</option>
-                    <option value="CORPORATE_EVENT">Corporate Event</option>
-                    <option value="CONFERENCE">Conference</option>
-                    <option value="PRODUCT_LAUNCH">Product Launch</option>
-                    <option value="PRIVATE_EVENT">Private Event</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Link Client Account</label>
-                  <select name="clientId" required value={formData.clientId} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400">
-                    <option value="">Choose Client</option>
-                    {clients.map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Event Date</label>
-                  <input type="date" name="eventDate" required value={formData.eventDate} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Start Time</label>
-                  <input type="text" name="startTime" placeholder="14:00" required value={formData.startTime} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">End Time</label>
-                  <input type="text" name="endTime" placeholder="22:00" required value={formData.endTime} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Venue Location</label>
-                  <input type="text" name="venue" placeholder="e.g. Armani Hotel" required value={formData.venue} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Google Maps URL (Optional)</label>
-                  <input type="text" name="googleMapsUrl" placeholder="https://..." value={formData.googleMapsUrl} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4 border-t border-white/[0.04] pt-4">
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Quotation Amount (AED)</label>
-                  <input type="number" name="quotationAmount" value={formData.quotationAmount} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Advance Received (AED)</label>
-                  <input type="number" name="advanceAmount" value={formData.advanceAmount} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Est Additional Expenses</label>
-                  <input type="number" name="additionalExpenses" value={formData.additionalExpenses} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Event Planner Notes</label>
-                <textarea name="notes" rows={2} value={formData.notes} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white resize-none" />
-              </div>
-
-              <div className="pt-4 border-t border-white/[0.04] flex justify-end gap-3">
-                <button type="button" onClick={() => setShowAddForm(false)} className="px-4 py-2 border border-white/[0.08] text-xs font-semibold rounded-xl text-gray-400 hover:text-white">
-                  Cancel
-                </button>
-                <button type="submit" className="px-6 py-2 bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs rounded-xl shadow-lg">
-                  Schedule Event
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
+
+      {/* ═══════════════════════════════════════════════════════
+          DELETE CONFIRM MODAL
+          ═══════════════════════════════════════════════════════ */}
+      {deleteId && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-[#0d0d1a] border border-red-500/20 rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center">
+            <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
+              <Trash2 className="w-5 h-5 text-red-400" />
+            </div>
+            <h3 className="text-base font-bold text-white mb-2">Delete Booking?</h3>
+            <p className="text-xs text-gray-500 mb-6 leading-relaxed">
+              This action cannot be undone. The booking and all associated staff assignments will be permanently removed.
+            </p>
+            <div className="flex gap-3 justify-center">
+              <button onClick={() => setDeleteId(null)} className="px-5 py-2.5 border border-white/[0.08] text-xs font-semibold rounded-xl text-gray-400 hover:text-white hover:border-white/20 transition-all">
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs rounded-xl transition-all disabled:opacity-60"
+              >
+                {deleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                {deleting ? 'Deleting...' : 'Yes, Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Drawer slide-in keyframe (injected inline) */}
+      <style jsx global>{`
+        @keyframes slideInRight {
+          from { transform: translateX(100%); opacity: 0; }
+          to   { transform: translateX(0); opacity: 1; }
+        }
+        .form-field {
+          width: 100%;
+          padding: 0.5rem 0.75rem;
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 0.625rem;
+          color: #f8fafc;
+          font-size: 0.75rem;
+          transition: all 0.15s;
+          outline: none;
+          appearance: none;
+        }
+        .form-field::placeholder { color: rgba(148,163,184,0.5); }
+        .form-field:focus {
+          border-color: rgba(139,92,246,0.5);
+          box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+          background: rgba(139,92,246,0.04);
+        }
+        .form-field option { background: #131320; color: #f8fafc; }
+        select.form-field { cursor: pointer; }
+      `}</style>
+    </div>
+  );
+}
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function Section({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-violet-400">{icon}</span>
+        <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{title}</h3>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function Field({ label, children, className = '' }: { label: string; children: React.ReactNode; className?: string }) {
+  return (
+    <div className={className}>
+      <label className="block text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function InfoCard({ icon, label, value, children }: { icon: React.ReactNode; label: string; value: string; children?: React.ReactNode }) {
+  return (
+    <div className="bg-black/20 p-3.5 rounded-xl border border-white/[0.05]">
+      <div className="flex items-center gap-2 mb-1">
+        <span className="text-gray-600">{icon}</span>
+        <span className="text-[10px] text-gray-600 uppercase font-bold tracking-wider">{label}</span>
+      </div>
+      <p className="text-sm font-semibold text-white pl-6">{value}</p>
+      {children && <div className="pl-6">{children}</div>}
     </div>
   );
 }

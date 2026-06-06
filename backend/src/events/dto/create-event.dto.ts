@@ -1,42 +1,58 @@
-import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
-import { EventType } from '@prisma/client';
+import { IsDateString, IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { EventType, BookingStatus } from '@prisma/client';
 
 export class CreateEventDto {
   @IsString()
-  @IsNotEmpty()
-  title: string;
+  @IsOptional()
+  title?: string;
 
   @IsEnum(EventType)
-  @IsNotEmpty()
-  type: EventType;
+  @IsOptional()
+  type?: EventType;
 
   @IsString()
-  @IsNotEmpty()
-  clientId: string;
+  @IsOptional()
+  clientId?: string;
 
   @IsString()
-  @IsNotEmpty()
-  venue: string;
+  @IsOptional()
+  clientName?: string;
+
+  @IsString()
+  @IsOptional()
+  clientPhone?: string;
+
+  @IsString()
+  @IsOptional()
+  venue?: string;
 
   @IsString()
   @IsOptional()
   googleMapsUrl?: string;
 
   @IsDateString()
-  @IsNotEmpty()
-  eventDate: string;
+  @IsOptional()
+  eventDate?: string;
 
   @IsString()
-  @IsNotEmpty()
-  startTime: string; // HH:MM
+  @IsOptional()
+  startTime?: string;
 
   @IsString()
-  @IsNotEmpty()
-  endTime: string; // HH:MM
+  @IsOptional()
+  endTime?: string;
 
   @IsString()
   @IsOptional()
   notes?: string;
+
+  @IsString()
+  @IsOptional()
+  additionalNotes?: string;
+
+  @IsEnum(BookingStatus)
+  @IsOptional()
+  bookingStatus?: BookingStatus;
 
   @IsNumber()
   @IsOptional()

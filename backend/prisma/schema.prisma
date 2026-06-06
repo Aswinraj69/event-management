@@ -37,6 +37,16 @@ enum EventType {
   CONFERENCE
   PRODUCT_LAUNCH
   PRIVATE_EVENT
+  PHOTOSHOOT
+  GRADUATION
+  OTHER
+}
+
+enum BookingStatus {
+  UPCOMING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
 }
 
 enum AssignmentStatus {
@@ -201,16 +211,20 @@ model Event {
   id                 String                 @id @default(uuid()) @db.Uuid
   companyId          String                 @map("company_id") @db.Uuid
   company            Company                @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  clientId           String                 @map("client_id") @db.Uuid
-  client             Client                 @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  clientId           String?                @map("client_id") @db.Uuid
+  client             Client?                @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  clientName         String?                @map("client_name") @db.VarChar(150)
+  clientPhone        String?                @map("client_phone") @db.VarChar(30)
   title              String                 @db.VarChar(150)
-  type               EventType
-  venue              String
+  type               EventType              @default(WEDDING)
+  venue              String?                @db.VarChar(255)
   googleMapsUrl      String?                @map("google_maps_url")
-  eventDate          DateTime               @map("event_date") @db.Date
-  startTime          String                 @map("start_time") @db.VarChar(10)
-  endTime            String                 @map("end_time") @db.VarChar(10)
+  eventDate          DateTime?              @map("event_date") @db.Date
+  startTime          String?                @map("start_time") @db.VarChar(10)
+  endTime            String?                @map("end_time") @db.VarChar(10)
   notes              String?
+  additionalNotes    String?                @map("additional_notes")
+  bookingStatus      BookingStatus          @default(UPCOMING) @map("booking_status")
   quotationAmount    Decimal                @default(0.00) @map("quotation_amount") @db.Decimal(12, 2)
   advanceAmount      Decimal                @default(0.00) @map("advance_amount") @db.Decimal(12, 2)
   additionalExpenses Decimal                @default(0.00) @map("additional_expenses") @db.Decimal(12, 2)

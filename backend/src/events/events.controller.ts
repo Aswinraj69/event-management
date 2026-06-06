@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Patch, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { AssignStaffDto } from './dto/assign-staff.dto';
@@ -45,6 +45,12 @@ export class EventsController {
     @Body() dto: CreateEventDto,
   ) {
     return this.eventsService.update(user.companyId, id, dto);
+  }
+
+  @Delete(':id')
+  @Roles(UserRole.COMPANY_ADMIN)
+  async delete(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.eventsService.delete(user.companyId, id);
   }
 
   @Put(':id/staff')

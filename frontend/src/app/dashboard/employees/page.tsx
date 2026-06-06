@@ -44,8 +44,12 @@ export default function EmployeesPage() {
   const handleAddEmployee = async (e: React.FormEvent) => {
     e.preventDefault();
     const skillsArray = formData.skills ? formData.skills.split(',').map(s => s.trim()).filter(Boolean) : [];
+    // Strip empty date strings — backend @IsDateString() rejects "" even with @IsOptional()
+    const DATE_FIELDS = ['dob', 'passportExpiry', 'visaExpiry'] as const;
+    const payload: any = { ...formData, skills: skillsArray };
+    DATE_FIELDS.forEach(f => { if (!payload[f]) delete payload[f]; });
     try {
-      const data = await createEmployee({ ...formData, skills: skillsArray }).unwrap();
+      const data = await createEmployee(payload).unwrap();
       setOnboardedResult(data);
       setShowAddForm(false);
       setFormData({ ...EMPTY_FORM });

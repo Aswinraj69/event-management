@@ -1,4 +1,5 @@
 import './globals.css';
+import StoreProvider from '@/store/provider';
 
 export const metadata = {
   title: 'EVENTO - Event Company Management SaaS Platform',
@@ -13,7 +14,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="antialiased min-h-screen bg-[#020617] text-white selection:bg-violet-500/30">
-        {children}
+        <StoreProvider>
+          {children}
+        </StoreProvider>
       </body>
     </html>
   );

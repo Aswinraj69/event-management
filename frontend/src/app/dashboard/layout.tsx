@@ -1,56 +1,45 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useDispatch, useSelector } from 'react-redux';
 import { Camera, Calendar, UserSquare2, Users2, FileText, Receipt, LayoutDashboard, LogOut, Loader2 } from 'lucide-react';
 import AiAgentWidget from '@/components/AiAgentWidget';
+import { initAuth, logout, selectUser } from '@/store/slices/authSlice';
+import { useGetBrandingQuery } from '@/store/api/eventoApi';
+import type { AppDispatch } from '@/store';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const dispatch = useDispatch<AppDispatch>();
+  const user = useSelector(selectUser);
 
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any | null>(null);
-  const [branding, setBranding] = useState<any | null>(null);
-
+  // Hydrate auth from localStorage once on mount
   useEffect(() => {
-    const token = localStorage.getItem('evento_token');
-    const savedUser = localStorage.getItem('evento_user');
+    dispatch(initAuth());
+  }, [dispatch]);
 
-    if (!token || !savedUser) {
-      router.push('/login');
-      return;
+  // Redirect if no token
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('evento_token');
+      if (!token) router.push('/login');
     }
+  }, [router]);
 
-    const parsedUser = JSON.parse(savedUser);
-    setUser(parsedUser);
-
-    // Fetch branding configurations
-    if (parsedUser.companyId) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://event-management-production-b372.up.railway.app'}/api/company/branding`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then(res => res.json())
-        .then(data => {
-          setBranding(data);
-          setLoading(false);
-        })
-        .catch(() => {
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-    }
-  }, []);
+  // Fetch branding via RTK Query (cached globally — not re-fetched on page switch)
+  const { data: branding, isLoading: brandingLoading } = useGetBrandingQuery(undefined, {
+    skip: !user,
+  });
 
   const handleLogout = () => {
-    localStorage.removeItem('evento_token');
-    localStorage.removeItem('evento_user');
+    dispatch(logout());
     router.push('/login');
   };
 
-  if (loading) {
+  if (!user || brandingLoading) {
     return (
       <div className="min-h-screen bg-transparent flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-violet-500 animate-spin" />
@@ -77,17 +66,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div
       className="min-h-screen bg-transparent flex relative"
-      style={{
-        '--primary': brandPrimary,
-      } as React.CSSProperties}
+      style={{ '--primary': brandPrimary } as React.CSSProperties}
     >
-      {/* Deep cosmic background unique to dashboard */}
+      {/* Deep cosmic background */}
       <div className="fixed inset-0 -z-10 bg-[#020617]" />
       <div className="fixed inset-0 -z-10" style={{ background: 'radial-gradient(ellipse at 20% 50%, rgba(124,58,237,0.12) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(45,212,191,0.08) 0%, transparent 60%)' }} />
-      {/* Sidebar navigation */}
+
+      {/* Sidebar */}
       <aside className="w-64 glass-sidebar flex flex-col justify-between p-6 z-10 shrink-0">
         <div>
-          {/* Logo brand indicator */}
+          {/* Brand logo */}
           <div className="flex items-center gap-3 mb-8">
             {branding?.logoUrl ? (
               <img src={branding.logoUrl} alt="Logo" className="w-8 h-8 rounded-lg object-cover border border-white/[0.08]" />
@@ -96,19 +84,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Camera className="w-5 h-5" />
               </div>
             )}
-            <span className="text-md font-bold tracking-tight text-white leading-tight">
-              {brandName}
-            </span>
+            <span className="text-md font-bold tracking-tight text-white leading-tight">{brandName}</span>
           </div>
 
-          {/* User profile identifier */}
+          {/* User profile */}
           <div className="mb-6 p-3 bg-black/20 backdrop-blur-xl border border-white/10 rounded-xl flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-violet-600/10 flex items-center justify-center font-bold text-[11px] text-violet-400">
-              {user?.firstName[0]}{user?.lastName[0]}
+              {user?.firstName?.[0]}{user?.lastName?.[0]}
             </div>
             <div className="overflow-hidden">
               <p className="text-xs font-semibold text-white truncate">{user?.firstName} {user?.lastName}</p>
-              <span className="text-[9px] text-gray-500 uppercase font-bold tracking-wider block mt-0.5">{user?.role.replace('_', ' ')}</span>
+              <span className="text-[9px] text-gray-500 uppercase font-bold tracking-wider block mt-0.5">{user?.role?.replace('_', ' ')}</span>
             </div>
           </div>
 
@@ -141,12 +127,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </button>
       </aside>
 
-      {/* Workspace Area */}
+      {/* Workspace */}
       <main className="flex-1 p-8 overflow-y-auto max-w-6xl mx-auto relative z-10">
         {children}
       </main>
 
-      {/* Global AI Assistant Widget */}
       <AiAgentWidget brandColor={brandPrimary} />
     </div>
   );

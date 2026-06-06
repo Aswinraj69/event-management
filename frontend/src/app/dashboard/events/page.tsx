@@ -409,24 +409,10 @@ export default function EventsPage() {
             <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
               <Section title="Client Information" icon={<User className="w-3.5 h-3.5" />}>
                 <div className="grid grid-cols-2 gap-3">
-                  {clients.length > 0 ? (
-                    <Field label="Select Client">
-                      <select name="clientId" value={formData.clientId} onChange={(e) => { handleFormChange(e); if (e.target.value !== '') setFormData(p => ({ ...p, clientName: '', clientPhone: '' })); }} className="form-field">
-                        <option value="">— Manual entry —</option>
-                        {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                      </select>
-                    </Field>
-                  ) : (
-                    <Field label="Client Name">
-                      <input type="text" name="clientName" placeholder="e.g. John & Sarah" value={formData.clientName} onChange={handleFormChange} className="form-field" />
-                    </Field>
-                  )}
+                  <Field label="Client Name">
+                    <input type="text" name="clientName" placeholder="e.g. John & Sarah" value={formData.clientName} onChange={handleFormChange} className="form-field" />
+                  </Field>
                   <Field label="Phone Number"><input type="tel" name="clientPhone" placeholder="+971 50 000 0000" value={formData.clientPhone} onChange={handleFormChange} className="form-field" /></Field>
-                  {(!formData.clientId || formData.clientId === '') && clients.length > 0 && (
-                    <Field label="Manual Client Name" className="col-span-2">
-                      <input type="text" name="clientName" placeholder="Enter new client name" value={formData.clientName} onChange={handleFormChange} className="form-field" />
-                    </Field>
-                  )}
                 </div>
               </Section>
               <Section title="Event Details" icon={<Calendar className="w-3.5 h-3.5" />}>

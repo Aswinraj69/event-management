@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import { Camera, Calendar, UserSquare2, Users2, FileText, Receipt, LayoutDashboard, LogOut, Loader2 } from 'lucide-react';
+import { Toaster } from 'react-hot-toast';
 import AiAgentWidget from '@/components/AiAgentWidget';
 import { initAuth, logout, selectUser } from '@/store/slices/authSlice';
 import { useGetBrandingQuery } from '@/store/api/eventoApi';
@@ -53,8 +54,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['COMPANY_ADMIN', 'EMPLOYEE', 'FREELANCER'] },
     { name: 'Events Manager', path: '/dashboard/events', icon: Calendar, roles: ['COMPANY_ADMIN', 'EMPLOYEE', 'FREELANCER'] },
-    { name: 'Master Calendar', path: '/dashboard/calendar', icon: Calendar, roles: ['COMPANY_ADMIN', 'EMPLOYEE', 'FREELANCER'] },
-    { name: 'Availability', path: '/dashboard/availability', icon: Calendar, roles: ['COMPANY_ADMIN', 'EMPLOYEE', 'FREELANCER'] },
     { name: 'Clients Directory', path: '/dashboard/clients', icon: Users2, roles: ['COMPANY_ADMIN'] },
     { name: 'Employees Roster', path: '/dashboard/employees', icon: UserSquare2, roles: ['COMPANY_ADMIN', 'EMPLOYEE', 'FREELANCER'] },
     { name: 'Quotations', path: '/dashboard/quotations', icon: FileText, roles: ['COMPANY_ADMIN'] },
@@ -128,7 +127,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Workspace */}
-      <main className="flex-1 p-8 overflow-y-auto max-w-6xl mx-auto relative z-10">
+      <main className="flex-1 p-8 overflow-y-auto relative z-10">
+        <Toaster position="top-right" toastOptions={{ style: { background: '#131320', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } }} />
         {children}
       </main>
 

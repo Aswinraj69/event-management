@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Share2, Mail, Trash, Check, X, Link as LinkIcon } from 'lucide-react';
+import { Plus, Share2, Mail, Trash, Check, X, Link as LinkIcon, Download } from 'lucide-react';
 import {
   useGetQuotationsQuery, useCreateQuotationMutation, useUpdateQuotationStatusMutation,
-  useGetClientsQuery, useGetBookingsQuery,
+  useGetClientsQuery, useGetBookingsQuery, useDeleteQuotationMutation,
 } from '@/store/api/eventoApi';
+import toast from 'react-hot-toast';
 
 export default function QuotationsPage() {
   // All served from shared cache — no duplicate fetches
@@ -14,6 +15,7 @@ export default function QuotationsPage() {
   const { data: events = [] } = useGetBookingsQuery();
   const [createQuotation] = useCreateQuotationMutation();
   const [updateQuotationStatus] = useUpdateQuotationStatusMutation();
+  const [deleteQuotation] = useDeleteQuotationMutation();
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [clientId, setClientId] = useState('');
@@ -36,14 +38,16 @@ export default function QuotationsPage() {
       setShowAddForm(false);
       setClientId(''); setEventId('');
       setServices([{ description: 'Photography Core Service - 1 Day Session', quantity: 1, unitPrice: 2500 }]);
-    } catch { alert('Failed to construct quotation'); }
+      toast.success('Quotation created successfully');
+    } catch { toast.error('Failed to construct quotation'); }
   };
 
   const handleUpdateStatus = async (id: string, status: string) => {
     try {
       const next = await updateQuotationStatus({ id, status }).unwrap();
       setSelectedQuo(next);
-    } catch { alert('Error updating status'); }
+      toast.success('Status updated');
+    } catch { toast.error('Error updating status'); }
   };
 
   const computeQuoTotal = (servicesArray: any[]) =>
@@ -52,7 +56,26 @@ export default function QuotationsPage() {
   const handleCopyMagicLink = () => {
     if (!selectedQuo?.magicLinkToken) return;
     navigator.clipboard.writeText(`${window.location.origin}/quote/${selectedQuo.magicLinkToken}`);
-    alert('Magic Link copied to clipboard!');
+    toast.success('Magic Link copied to clipboard!');
+  };
+
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('quotation-preview-content');
+    if (!element) return;
+    try {
+      const html2pdf = (await import('html2pdf.js')).default;
+      const opt = {
+        margin: 0.3,
+        filename: `Quotation_${selectedQuo?.quotationNumber || 'Document'}.pdf`,
+        image: { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0f0f13' },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' as const }
+      };
+      html2pdf().set(opt).from(element).save();
+      toast.success('PDF download started');
+    } catch (e) {
+      toast.error('Failed to generate PDF');
+    }
   };
 
   return (
@@ -105,9 +128,27 @@ export default function QuotationsPage() {
             <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl space-y-6 animate-fade-in text-xs relative">
               <div className="flex justify-between items-center border-b border-white/10 pb-4">
                 <div><h3 className="font-bold text-white text-md">Document Preview</h3><p className="text-[10px] text-gray-500 mt-0.5">Branded layout template</p></div>
-                <button onClick={() => { setSelectedQuo(null); setSharingMethod(''); }} className="text-gray-500 hover:text-white"><X className="w-4 h-4" /></button>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => {
+                    toast((t) => (
+                      <div>
+                        <p className="text-sm mb-3 font-semibold text-white">Delete Quotation?</p>
+                        <p className="text-xs text-gray-400 mb-4">This action cannot be undone.</p>
+                        <div className="flex gap-2 justify-end">
+                          <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1.5 text-xs text-gray-400 hover:text-white transition-colors">Cancel</button>
+                          <button onClick={async () => {
+                            toast.dismiss(t.id);
+                            try { await deleteQuotation(selectedQuo.id).unwrap(); setSelectedQuo(null); toast.success('Quotation deleted'); }
+                            catch { toast.error('Failed to delete'); }
+                          }} className="px-3 py-1.5 text-xs bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors">Confirm Delete</button>
+                        </div>
+                      </div>
+                    ), { duration: 5000 });
+                  }} className="text-red-400 hover:text-red-300 p-2 transition-colors"><Trash className="w-4 h-4" /></button>
+                  <button onClick={() => { setSelectedQuo(null); setSharingMethod(''); }} className="text-gray-500 hover:text-white p-2"><X className="w-4 h-4" /></button>
+                </div>
               </div>
-              <div className="bg-[#0f0f13] border border-white/[0.06] rounded-xl p-5 space-y-4 shadow-inner">
+              <div id="quotation-preview-content" className="bg-[#0f0f13] border border-white/[0.06] rounded-xl p-5 space-y-4 shadow-inner">
                 <div className="flex justify-between items-start border-b border-white/[0.03] pb-3">
                   <div>
                     {selectedQuo.company?.logoUrl ? <img src={selectedQuo.company.logoUrl} alt="Logo" className="w-10 h-10 object-cover rounded-lg border border-white/10 mb-2" /> : <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center font-bold text-white mb-2">{selectedQuo.company?.name[0]}</div>}
@@ -149,7 +190,10 @@ export default function QuotationsPage() {
                   <button onClick={() => { handleUpdateStatus(selectedQuo.id, 'SENT'); setSharingMethod('email'); }} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl"><Mail className="w-3.5 h-3.5" /> Share Email</button>
                   <button onClick={() => { handleUpdateStatus(selectedQuo.id, 'SENT'); setSharingMethod('whatsapp'); }} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl"><Share2 className="w-3.5 h-3.5" /> Share WhatsApp</button>
                 </div>
-                <button onClick={handleCopyMagicLink} className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 text-white font-semibold rounded-xl transition-all"><LinkIcon className="w-3.5 h-3.5" /> Copy Client Magic Link</button>
+                <div className="flex gap-2">
+                  <button onClick={handleCopyMagicLink} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 text-white font-semibold rounded-xl transition-all"><LinkIcon className="w-3.5 h-3.5" /> Copy Client Link</button>
+                  <button onClick={handleDownloadPDF} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 text-white font-semibold rounded-xl transition-all"><Download className="w-3.5 h-3.5" /> Download PDF</button>
+                </div>
                 {sharingMethod && (
                   <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-[10px] text-emerald-400 font-medium animate-fade-in">
                     {sharingMethod === 'email' ? <p>&bull; Simulated email dispatched with branded PDF attachment link to `{selectedQuo.client?.email}` successfully.</p> : <p>&bull; Simulated WhatsApp notification compiled and shared with client line `{selectedQuo.client?.phone}` successfully.</p>}
@@ -178,8 +222,8 @@ export default function QuotationsPage() {
             <div className="mb-6"><h3 className="text-xl font-bold">Create Professional Quotation</h3><p className="text-xs text-gray-500 mt-1">Compile pricing estimations and terms.</p></div>
             <form onSubmit={handleCreateQuo} className="space-y-5">
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Link Client Card</label><select required value={clientId} onChange={e => setClientId(e.target.value)} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400 focus:outline-none"><option value="">Choose Client</option>{clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
-                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Link Scheduled Event (Optional)</label><select value={eventId} onChange={e => setEventId(e.target.value)} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400 focus:outline-none"><option value="">No Linked Event</option>{events.map(e => <option key={e.id} value={e.id}>{e.title}</option>)}</select></div>
+                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Link Client Card</label><select required value={clientId} onChange={e => setClientId(e.target.value)} className="w-full px-3 py-2 bg-[#0f0f13] border border-white/[0.08] rounded-xl text-xs text-white focus:outline-none"><option value="">Choose Client</option>{clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
+                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Link Scheduled Event (Optional)</label><select value={eventId} onChange={e => setEventId(e.target.value)} className="w-full px-3 py-2 bg-[#0f0f13] border border-white/[0.08] rounded-xl text-xs text-white focus:outline-none"><option value="">No Linked Event</option>{events.map(e => <option key={e.id} value={e.id}>{e.title}</option>)}</select></div>
               </div>
               <div className="space-y-3">
                 <div className="flex justify-between items-center"><label className="block text-[10px] font-bold text-gray-400 uppercase">Estimates Itemized Line Items</label><button type="button" onClick={handleAddServiceRow} className="text-[10px] font-bold text-violet-400 hover:text-white">+ Add Row</button></div>

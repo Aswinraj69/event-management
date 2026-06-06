@@ -1,8 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { UserPlus, ShieldCheck, Mail, Phone, CalendarCheck2, Award, FileSearch, Trash2, X } from 'lucide-react';
-import { useGetEmployeesQuery, useCreateEmployeeMutation, useDeleteEmployeeMutation } from '@/store/api/eventoApi';
+import { UserPlus, ShieldCheck, Mail, Phone, CalendarCheck2, Award, FileSearch, Trash2, X, Calendar as CalendarIcon } from 'lucide-react';
+import { useGetEmployeesQuery, useCreateEmployeeMutation, useDeleteEmployeeMutation, useGetBookingsQuery } from '@/store/api/eventoApi';
+import { Calendar as BigCalendar, dateFnsLocalizer, Views } from 'react-big-calendar';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
+import { enUS } from 'date-fns/locale/en-US';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import toast from 'react-hot-toast';
+
+const locales = { 'en-US': enUS };
+const localizer = dateFnsLocalizer({ format, parse, startOfWeek, getDay, locales });
 
 const EMPTY_FORM = {
   email: '', firstName: '', lastName: '', phone: '', role: 'EMPLOYEE', employeeId: '',
@@ -13,8 +21,12 @@ const EMPTY_FORM = {
 
 export default function EmployeesPage() {
   const { data: employees = [], isLoading } = useGetEmployeesQuery();
+  const { data: bookings = [] } = useGetBookingsQuery();
   const [createEmployee, { isLoading: creating }] = useCreateEmployeeMutation();
   const [deleteEmployee] = useDeleteEmployeeMutation();
+  
+  const [calendarView, setCalendarView] = useState(Views.MONTH);
+  const [calendarDate, setCalendarDate] = useState(new Date());
 
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
@@ -37,17 +49,30 @@ export default function EmployeesPage() {
       setOnboardedResult(data);
       setShowAddForm(false);
       setFormData({ ...EMPTY_FORM });
+      toast.success('Employee onboarded successfully');
     } catch (err: any) {
-      alert(err?.data?.message || 'Onboarding failed');
+      toast.error(err?.data?.message || 'Onboarding failed');
     }
   };
 
   const handleDeactivate = async (id: string) => {
-    if (!confirm('Are you sure you want to suspend this employee?')) return;
-    try {
-      await deleteEmployee(id).unwrap();
-      setSelectedEmployee(null);
-    } catch { alert('Deactivation request failed'); }
+    toast((t) => (
+      <div>
+        <p className="text-sm mb-3 font-semibold text-white">Suspend this employee?</p>
+        <p className="text-xs text-gray-400 mb-4">This will deactivate their account.</p>
+        <div className="flex gap-2 justify-end">
+          <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1.5 text-xs text-gray-400 hover:text-white transition-colors">Cancel</button>
+          <button onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              await deleteEmployee(id).unwrap();
+              setSelectedEmployee(null);
+              toast.success('Employee suspended successfully');
+            } catch { toast.error('Deactivation request failed'); }
+          }} className="px-3 py-1.5 text-xs bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors">Confirm</button>
+        </div>
+      </div>
+    ), { duration: 5000 });
   };
 
   const getExpiryBadgeClass = (expiryDateStr: string | null) => {
@@ -193,45 +218,106 @@ export default function EmployeesPage() {
         </div>
       </div>
 
-      {showAddForm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50 animate-fade-in">
-          <div className="bg-[#0f0f13] border border-white/[0.08] rounded-2xl max-w-2xl w-full p-8 max-h-[85vh] overflow-y-auto shadow-2xl relative">
-            <button onClick={() => setShowAddForm(false)} className="absolute right-6 top-6 text-gray-500 hover:text-white"><X className="w-5 h-5" /></button>
-            <div className="mb-6"><h3 className="text-xl font-bold">Onboard New Team Member</h3><p className="text-xs text-gray-500 mt-1">This registers credentials and compiles a new EmployeeProfile.</p></div>
-            <form onSubmit={handleAddEmployee} className="space-y-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">First Name</label><input type="text" name="firstName" required value={formData.firstName} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
-                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Last Name</label><input type="text" name="lastName" required value={formData.lastName} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Email Address</label><input type="email" name="email" required value={formData.email} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
-                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Phone</label><input type="text" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Platform Role</label><select name="role" value={formData.role} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400"><option value="EMPLOYEE">Employee</option><option value="FREELANCER">Freelancer</option></select></div>
-                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Employee Type</label><select name="employeeType" value={formData.employeeType} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400"><option value="PERMANENT">Permanent</option><option value="FREELANCER">Freelancer</option><option value="PART_TIME">Part-Time</option><option value="VENDOR_STAFF">Vendor Staff</option></select></div>
-                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Designation</label><input type="text" name="designation" required value={formData.designation} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-4 border-t border-white/[0.04] pt-4">
-                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Passport Number</label><input type="text" name="passportNumber" value={formData.passportNumber} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
-                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Passport Expiry</label><input type="date" name="passportExpiry" value={formData.passportExpiry} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400" /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Visa Number</label><input type="text" name="visaNumber" value={formData.visaNumber} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
-                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Visa Expiry</label><input type="date" name="visaExpiry" value={formData.visaExpiry} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400" /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Emirates ID</label><input type="text" name="emiratesId" value={formData.emiratesId} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
-                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Driving License</label><input type="text" name="drivingLicense" value={formData.drivingLicense} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
-              </div>
-              <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Skills / Capabilities (Comma separated)</label><input type="text" name="skills" placeholder="Photographer, Drone, Lighting..." value={formData.skills} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
-              <div className="pt-4 border-t border-white/[0.04] flex justify-end gap-3">
-                <button type="button" onClick={() => setShowAddForm(false)} className="px-4 py-2 border border-white/[0.08] text-xs font-semibold rounded-xl text-gray-400 hover:text-white">Cancel</button>
-                <button type="submit" disabled={creating} className="px-6 py-2 bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs rounded-xl shadow-lg disabled:opacity-60">{creating ? 'Submitting...' : 'Submit Onboarding'}</button>
-              </div>
-            </form>
+      {/* Master Calendar */}
+      <div className="pt-8 border-t border-white/[0.06]">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-white flex items-center gap-2"><CalendarIcon className="w-5 h-5 text-violet-400" /> Master Schedule</h2>
+            <p className="text-xs text-gray-500 mt-1">Global view of all upcoming events and staff assignments.</p>
           </div>
         </div>
+        <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl min-h-[600px] overflow-hidden">
+          <style dangerouslySetInnerHTML={{__html: `
+            .rbc-calendar { font-family: 'DM Sans', sans-serif; }
+            .rbc-month-view, .rbc-time-view, .rbc-agenda-view { border-color: rgba(255,255,255,0.05); }
+            .rbc-header { border-bottom: 1px solid rgba(255,255,255,0.05); border-left: 1px solid rgba(255,255,255,0.05); padding: 10px; color: #94a3b8; font-weight: 700; text-transform: uppercase; font-size: 10px; }
+            .rbc-month-row { border-top: 1px solid rgba(255,255,255,0.05); }
+            .rbc-day-bg { border-left: 1px solid rgba(255,255,255,0.05); }
+            .rbc-off-range-bg { background: rgba(0,0,0,0.2); }
+            .rbc-date-cell { padding: 8px; font-weight: 600; font-size: 12px; color: #cbd5e1; }
+            .rbc-off-range { color: #475569; }
+            .rbc-today { background: rgba(139, 92, 246, 0.05); }
+            .rbc-toolbar button { color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; font-weight: 600; font-size: 12px; padding: 6px 12px; transition: all 0.2s; }
+            .rbc-toolbar button:hover, .rbc-toolbar button:active, .rbc-toolbar button.rbc-active { background: rgba(139, 92, 246, 0.2); border-color: rgba(139, 92, 246, 0.5); color: white; box-shadow: none; }
+            .rbc-toolbar .rbc-toolbar-label { font-weight: 800; font-size: 18px; color: white; font-family: 'Outfit', sans-serif; }
+            .rbc-time-content { border-top: 1px solid rgba(255,255,255,0.05); }
+            .rbc-time-header-content { border-left: 1px solid rgba(255,255,255,0.05); }
+            .rbc-timeslot-group { border-bottom: 1px solid rgba(255,255,255,0.05); min-height: 60px; }
+            .rbc-time-gutter .rbc-timeslot-group { border-right: 1px solid rgba(255,255,255,0.05); }
+            .rbc-time-slot { color: #64748b; font-size: 10px; }
+            .rbc-allday-cell { border-bottom: 1px solid rgba(255,255,255,0.05); }
+            .rbc-agenda-view table.rbc-agenda-table { border: 1px solid rgba(255,255,255,0.05); }
+            .rbc-agenda-view table.rbc-agenda-table thead > tr > th { border-bottom: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; }
+            .rbc-agenda-view table.rbc-agenda-table tbody > tr > td { border-top: 1px solid rgba(255,255,255,0.05); color: #94a3b8; }
+          `}} />
+          <BigCalendar
+            localizer={localizer}
+            events={bookings.map((e: any) => {
+              const start = new Date(e.eventDate);
+              if (e.startTime) { const [h,m] = e.startTime.split(':'); start.setHours(Number(h), Number(m)); }
+              const end = new Date(e.eventDate);
+              if (e.endTime) { const [h,m] = e.endTime.split(':'); end.setHours(Number(h), Number(m)); }
+              return { id: e.id, title: `${e.title} (${e.staffAssignments?.length || 0} staff)`, start, end, resource: e };
+            })}
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: '100%' }}
+            view={calendarView}
+            onView={(v: any) => setCalendarView(v)}
+            date={calendarDate}
+            onNavigate={(d: any) => setCalendarDate(d)}
+            eventPropGetter={() => ({ style: { backgroundColor: '#8b5cf6', borderRadius: '8px', opacity: 0.9, color: 'white', border: '0px', fontSize: '11px', fontWeight: 'bold', padding: '2px 6px' } })}
+            popup
+            selectable
+          />
+        </div>
+      </div>
+
+      {/* Onboard Drawer */}
+      {showAddForm && (
+        <>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 animate-fade-in" onClick={() => !creating && setShowAddForm(false)} />
+          <div className="fixed inset-y-0 right-0 h-[100dvh] w-full max-w-xl bg-[#0d0d1a] border-l border-white/[0.08] shadow-2xl z-50 flex flex-col" style={{ animation: 'slideInRight 0.3s cubic-bezier(0.16,1,0.3,1)' }}>
+            <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.08] shrink-0">
+              <div><h2 className="text-lg font-bold text-white">Onboard New Team Member</h2><p className="text-xs text-gray-500 mt-0.5">Register credentials and compile EmployeeProfile.</p></div>
+              <button onClick={() => setShowAddForm(false)} className="p-2 rounded-lg hover:bg-white/10 text-gray-500 hover:text-white transition-all"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <form onSubmit={handleAddEmployee} className="space-y-5">
+                <div className="grid grid-cols-2 gap-4">
+                  <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">First Name</label><input type="text" name="firstName" required value={formData.firstName} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
+                  <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Last Name</label><input type="text" name="lastName" required value={formData.lastName} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Email Address</label><input type="email" name="email" required value={formData.email} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
+                  <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Phone</label><input type="text" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Platform Role</label><select name="role" value={formData.role} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white [&>option]:bg-[#131320] [&>option]:text-white"><option value="EMPLOYEE">Employee</option><option value="FREELANCER">Freelancer</option></select></div>
+                  <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Employee Type</label><select name="employeeType" value={formData.employeeType} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white [&>option]:bg-[#131320] [&>option]:text-white"><option value="PERMANENT">Permanent</option><option value="FREELANCER">Freelancer</option><option value="PART_TIME">Part-Time</option><option value="VENDOR_STAFF">Vendor Staff</option></select></div>
+                  <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Designation</label><input type="text" name="designation" required value={formData.designation} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 border-t border-white/[0.04] pt-4">
+                  <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Passport Number</label><input type="text" name="passportNumber" value={formData.passportNumber} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
+                  <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Passport Expiry</label><input type="date" name="passportExpiry" value={formData.passportExpiry} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400" /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Visa Number</label><input type="text" name="visaNumber" value={formData.visaNumber} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
+                  <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Visa Expiry</label><input type="date" name="visaExpiry" value={formData.visaExpiry} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400" /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Emirates ID</label><input type="text" name="emiratesId" value={formData.emiratesId} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
+                  <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Driving License</label><input type="text" name="drivingLicense" value={formData.drivingLicense} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
+                </div>
+                <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Skills / Capabilities (Comma separated)</label><input type="text" name="skills" placeholder="Photographer, Drone, Lighting..." value={formData.skills} onChange={handleInputChange} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
+              </form>
+            </div>
+            <div className="px-6 py-4 border-t border-white/[0.08] flex items-center justify-end gap-3 shrink-0">
+              <button type="button" onClick={() => setShowAddForm(false)} className="px-4 py-2.5 border border-white/[0.08] text-xs font-semibold rounded-xl text-gray-400 hover:text-white transition-all">Cancel</button>
+              <button onClick={handleAddEmployee} disabled={creating} className="px-6 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold text-xs rounded-xl shadow-lg transition-all disabled:opacity-60">{creating ? 'Submitting...' : 'Submit Onboarding'}</button>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

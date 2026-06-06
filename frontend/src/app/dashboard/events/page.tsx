@@ -14,6 +14,7 @@ import {
   useDeleteBookingMutation, useAssignStaffMutation, useUpdateAssignmentMutation,
   useGetClientsQuery, useGetEmployeesQuery,
 } from '@/store/api/eventoApi';
+import toast from 'react-hot-toast';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -182,15 +183,16 @@ export default function EventsPage() {
       if (drawerMode === 'edit' && editingId) await updateBooking({ id: editingId, body: payload }).unwrap();
       else await createBooking(payload).unwrap();
       setShowDrawer(false);
-    } catch (e: any) { alert(e?.data?.message || 'Failed to save booking'); }
+      toast.success(drawerMode === 'edit' ? 'Booking updated successfully' : 'Booking created successfully');
+    } catch (e: any) { toast.error(e?.data?.message || 'Failed to save booking'); }
     finally { setSaving(false); }
   };
 
   const handleDelete = async () => {
     if (!deleteId) return;
     setDeleting(true);
-    try { await deleteBooking(deleteId).unwrap(); setDeleteId(null); }
-    catch { alert('Failed to delete booking'); }
+    try { await deleteBooking(deleteId).unwrap(); setDeleteId(null); toast.success('Booking deleted'); }
+    catch { toast.error('Failed to delete booking'); }
     finally { setDeleting(false); }
   };
 
@@ -202,12 +204,12 @@ export default function EventsPage() {
     try {
       await assignStaff({ id: selectedEvent!.id, body: { assignments: tempAssignments } }).unwrap();
       setSelectedEvent(null);
-      alert('Roster updated and notifications dispatched!');
-    } catch (e: any) { setAssignmentError(e?.data?.message || 'Double booking collision detected'); }
+      toast.success('Roster updated and notifications dispatched!');
+    } catch (e: any) { setAssignmentError(e?.data?.message || 'Double booking collision detected'); toast.error('Roster update failed'); }
   };
   const handleResponse = async (assignmentId: string, status: 'ACCEPTED' | 'DECLINED') => {
-    try { await updateAssignment({ assignmentId, status }).unwrap(); setSelectedEvent(null); }
-    catch { alert('Status update failed'); }
+    try { await updateAssignment({ assignmentId, status }).unwrap(); setSelectedEvent(null); toast.success(`Assignment ${status.toLowerCase()}`); }
+    catch { toast.error('Status update failed'); }
   };
 
   // ─── Stats ─────────────────────────────────────────────────────────────────
@@ -347,7 +349,25 @@ export default function EventsPage() {
                             <button onClick={() => openEdit(b)} className="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-gray-300 hover:bg-white/[0.08] hover:text-white transition-colors"><Pencil className="w-4 h-4 text-violet-400" /> Edit Booking</button>
                             <button onClick={() => { handleSelectEvent(b); setOpenActionId(null); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-gray-300 hover:bg-white/[0.08] hover:text-white transition-colors"><Users className="w-4 h-4 text-indigo-400" /> Assign Staff</button>
                             <div className="border-t border-white/[0.08] my-1.5" />
-                            <button onClick={() => { setDeleteId(b.id); setOpenActionId(null); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/15 transition-colors"><Trash2 className="w-4 h-4" /> Delete</button>
+                            <button onClick={() => { 
+                              setOpenActionId(null); 
+                              toast((t) => (
+                                <div>
+                                  <p className="text-sm mb-3 font-semibold text-white">Delete this booking?</p>
+                                  <p className="text-xs text-gray-400 mb-4">This action cannot be undone.</p>
+                                  <div className="flex gap-2 justify-end">
+                                    <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1.5 text-xs text-gray-400 hover:text-white transition-colors">Cancel</button>
+                                    <button onClick={async () => {
+                                      toast.dismiss(t.id);
+                                      setDeleting(true);
+                                      try { await deleteBooking(b.id).unwrap(); toast.success('Booking deleted'); }
+                                      catch { toast.error('Failed to delete booking'); }
+                                      finally { setDeleting(false); }
+                                    }} className="px-3 py-1.5 text-xs bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors">Confirm Delete</button>
+                                  </div>
+                                </div>
+                              ), { duration: 5000 });
+                            }} className="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/15 transition-colors"><Trash2 className="w-4 h-4" /> Delete</button>
                           </>}
                         </div>
                       )}

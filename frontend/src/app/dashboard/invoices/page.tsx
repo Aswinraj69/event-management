@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, QrCode, DollarSign, X } from 'lucide-react';
+import { Plus, QrCode, DollarSign, X, Download, Trash } from 'lucide-react';
 import {
   useGetInvoicesQuery, useCreateInvoiceMutation, useRecordPaymentMutation,
-  useGetClientsQuery, useGetBookingsQuery,
+  useGetClientsQuery, useGetBookingsQuery, useDeleteInvoiceMutation,
 } from '@/store/api/eventoApi';
+import toast from 'react-hot-toast';
 
 export default function InvoicesPage() {
   // All cached globally — no duplicate fetches across pages
@@ -14,6 +15,7 @@ export default function InvoicesPage() {
   const { data: events = [] } = useGetBookingsQuery();
   const [createInvoice] = useCreateInvoiceMutation();
   const [recordPayment] = useRecordPaymentMutation();
+  const [deleteInvoice] = useDeleteInvoiceMutation();
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [clientId, setClientId] = useState('');
@@ -35,7 +37,8 @@ export default function InvoicesPage() {
       await createInvoice({ clientId, eventId: eventId || undefined, subtotal: Number(subtotal), taxRate: Number(taxRate), discount: Number(discount), dueDate }).unwrap();
       setShowAddForm(false);
       setClientId(''); setEventId(''); setSubtotal(0); setDiscount(0); setDueDate('');
-    } catch { alert('Failed to generate tax invoice'); }
+      toast.success('Tax invoice generated successfully');
+    } catch { toast.error('Failed to generate tax invoice'); }
   };
 
   const handleRecordPayment = async (e: React.FormEvent) => {
@@ -45,7 +48,27 @@ export default function InvoicesPage() {
       setSelectedInv(next);
       setShowPayForm(false);
       setPaymentAmount(0); setRefNum('');
-    } catch { alert('Failed to log payment transaction'); }
+      toast.success('Payment recorded successfully');
+    } catch { toast.error('Failed to log payment transaction'); }
+  };
+
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('invoice-preview-content');
+    if (!element) return;
+    try {
+      const html2pdf = (await import('html2pdf.js')).default;
+      const opt = {
+        margin: 0.3,
+        filename: `Invoice_${selectedInv?.invoiceNumber || 'Document'}.pdf`,
+        image: { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0f0f13' },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' as const }
+      };
+      html2pdf().set(opt).from(element).save();
+      toast.success('PDF download started');
+    } catch (e) {
+      toast.error('Failed to generate PDF');
+    }
   };
 
   const getInvoiceBalance = (invoice: any) => {
@@ -113,10 +136,28 @@ export default function InvoicesPage() {
             <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-6 rounded-2xl space-y-6 animate-fade-in text-xs relative">
               <div className="flex justify-between items-center border-b border-white/10 pb-4">
                 <div><h3 className="font-bold text-white text-md">Invoice Ledger</h3><p className="text-[10px] text-gray-500 mt-0.5">VAT and compliance parameters</p></div>
-                <button onClick={() => { setSelectedInv(null); setShowPayForm(false); }} className="text-gray-500 hover:text-white"><X className="w-4 h-4" /></button>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => {
+                    toast((t) => (
+                      <div>
+                        <p className="text-sm mb-3 font-semibold text-white">Delete Invoice?</p>
+                        <p className="text-xs text-gray-400 mb-4">This action cannot be undone.</p>
+                        <div className="flex gap-2 justify-end">
+                          <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1.5 text-xs text-gray-400 hover:text-white transition-colors">Cancel</button>
+                          <button onClick={async () => {
+                            toast.dismiss(t.id);
+                            try { await deleteInvoice(selectedInv.id).unwrap(); setSelectedInv(null); toast.success('Invoice deleted'); }
+                            catch { toast.error('Failed to delete'); }
+                          }} className="px-3 py-1.5 text-xs bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors">Confirm Delete</button>
+                        </div>
+                      </div>
+                    ), { duration: 5000 });
+                  }} className="text-red-400 hover:text-red-300 p-2 transition-colors"><Trash className="w-4 h-4" /></button>
+                  <button onClick={() => { setSelectedInv(null); setShowPayForm(false); }} className="text-gray-500 hover:text-white p-2"><X className="w-4 h-4" /></button>
+                </div>
               </div>
 
-              <div className="bg-[#0f0f13] border border-white/[0.06] rounded-xl p-5 space-y-4 shadow-inner relative">
+              <div id="invoice-preview-content" className="bg-[#0f0f13] border border-white/[0.06] rounded-xl p-5 space-y-4 shadow-inner relative">
                 <div className="absolute top-12 right-6 opacity-10 pointer-events-none select-none border-4 border-solid border-white/20 p-2 text-2xl font-bold uppercase rounded-xl tracking-widest text-white rotate-12">{selectedInv.status}</div>
                 <div className="flex justify-between items-start border-b border-white/[0.03] pb-3">
                   <div>
@@ -161,9 +202,9 @@ export default function InvoicesPage() {
                 ) : <span className="text-gray-600 italic block text-xs">No payment transaction records linked</span>}
               </div>
 
-              {getInvoiceBalance(selectedInv) > 0 ? (
-                <div className="border-t border-white/10 pt-4">
-                  {!showPayForm ? (
+              <div className="border-t border-white/10 pt-4 space-y-3">
+                {getInvoiceBalance(selectedInv) > 0 ? (
+                  !showPayForm ? (
                     <button onClick={() => { setPaymentAmount(getInvoiceBalance(selectedInv)); setShowPayForm(true); }} className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl">
                       <DollarSign className="w-4 h-4" /> Record Deposit Payment
                     </button>
@@ -172,16 +213,21 @@ export default function InvoicesPage() {
                       <div className="flex justify-between items-center mb-1"><span className="font-bold text-[10px] text-violet-400">Record Deposit Transaction</span><button type="button" onClick={() => setShowPayForm(false)} className="text-gray-500 hover:text-white"><X className="w-3.5 h-3.5" /></button></div>
                       <div className="grid grid-cols-2 gap-2">
                         <div><label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Paid Amount (AED)</label><input type="number" required min={0.01} max={getInvoiceBalance(selectedInv)} value={paymentAmount} onChange={e => setPaymentAmount(Number(e.target.value))} className="w-full bg-black/40 border border-white/[0.08] text-xs text-white rounded-lg py-1.5 px-2.5 focus:outline-none" /></div>
-                        <div><label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Method</label><select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)} className="w-full bg-black/40 border border-white/[0.08] text-xs text-gray-400 rounded-lg py-1.5 px-2 focus:outline-none"><option value="Bank Transfer">Bank Transfer</option><option value="Cash">Cash</option><option value="Stripe">Stripe Gateway</option><option value="Razorpay">Razorpay Gateway</option></select></div>
+                        <div><label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Method</label><select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)} className="w-full bg-[#0f0f13] border border-white/[0.08] text-xs text-white rounded-lg py-1.5 px-2 focus:outline-none"><option value="Bank Transfer">Bank Transfer</option><option value="Cash">Cash</option><option value="Stripe">Stripe Gateway</option><option value="Razorpay">Razorpay Gateway</option></select></div>
                       </div>
                       <div><label className="block text-[9px] font-bold text-gray-500 uppercase mb-1">Reference Code</label><input type="text" placeholder="e.g. TXN-198822" value={refNum} onChange={e => setRefNum(e.target.value)} className="w-full bg-black/40 border border-white/[0.08] text-xs text-white rounded-lg py-1.5 px-2.5 focus:outline-none" /></div>
                       <button type="submit" className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-[11px]">Commit Payment Row</button>
                     </form>
-                  )}
-                </div>
-              ) : (
-                <div className="pt-2 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl font-bold text-center">Invoice is Fully Settled</div>
-              )}
+                  )
+                ) : (
+                  <div className="pt-2 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl font-bold text-center">Invoice is Fully Settled</div>
+                )}
+                {!showPayForm && (
+                  <button onClick={handleDownloadPDF} className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 text-white font-semibold rounded-xl transition-all">
+                    <Download className="w-3.5 h-3.5" /> Download PDF
+                  </button>
+                )}
+              </div>
             </div>
           ) : (
             <div className="bg-black/30 backdrop-blur-3xl border border-white/10 shadow-2xl p-8 text-center rounded-2xl text-xs text-gray-500 border-dashed">
@@ -198,8 +244,8 @@ export default function InvoicesPage() {
             <button onClick={() => setShowAddForm(false)} className="absolute right-6 top-6 text-gray-500 hover:text-white"><X className="w-5 h-5" /></button>
             <div className="mb-6"><h3 className="text-xl font-bold">Generate Tax Invoice</h3><p className="text-xs text-gray-500 mt-1">Compile client accounts and calculate tax (VAT) compliance.</p></div>
             <form onSubmit={handleCreateInvoice} className="space-y-4">
-              <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Debtor Client</label><select required value={clientId} onChange={e => setClientId(e.target.value)} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400 focus:outline-none"><option value="">Choose Client</option>{clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
-              <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Scheduled Event (Optional)</label><select value={eventId} onChange={e => setEventId(e.target.value)} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-gray-400 focus:outline-none"><option value="">No Linked Event</option>{events.map(e => <option key={e.id} value={e.id}>{e.title}</option>)}</select></div>
+              <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Debtor Client</label><select required value={clientId} onChange={e => setClientId(e.target.value)} className="w-full px-3 py-2 bg-[#0f0f13] border border-white/[0.08] rounded-xl text-xs text-white focus:outline-none"><option value="">Choose Client</option>{clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
+              <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Scheduled Event (Optional)</label><select value={eventId} onChange={e => setEventId(e.target.value)} className="w-full px-3 py-2 bg-[#0f0f13] border border-white/[0.08] rounded-xl text-xs text-white focus:outline-none"><option value="">No Linked Event</option>{events.map(e => <option key={e.id} value={e.id}>{e.title}</option>)}</select></div>
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Subtotal Amount (AED)</label><input type="number" required min={0} value={subtotal} onChange={e => setSubtotal(Number(e.target.value))} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>
                 <div><label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Discount (AED)</label><input type="number" min={0} value={discount} onChange={e => setDiscount(Number(e.target.value))} className="w-full px-3 py-2 bg-black/40 border border-white/[0.08] rounded-xl text-xs text-white" /></div>

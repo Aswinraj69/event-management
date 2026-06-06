@@ -98,6 +98,10 @@ export const eventoApi = createApi({
       }),
       invalidatesTags: ['Invoice', 'InvoiceStats'],
     }),
+    deleteInvoice: builder.mutation<any, string>({
+      query: (id) => ({ url: `/invoices/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['Invoice', 'InvoiceStats'],
+    }),
 
     // ── Quotations ────────────────────────────────────────────────────────────
     getQuotations: builder.query<any[], void>({
@@ -114,6 +118,10 @@ export const eventoApi = createApi({
         method: 'PATCH',
         body: { status },
       }),
+      invalidatesTags: ['Quotation'],
+    }),
+    deleteQuotation: builder.mutation<any, string>({
+      query: (id) => ({ url: `/quotations/${id}`, method: 'DELETE' }),
       invalidatesTags: ['Quotation'],
     }),
 
@@ -160,9 +168,11 @@ export const {
   useGetInvoiceStatsQuery,
   useCreateInvoiceMutation,
   useRecordPaymentMutation,
+  useDeleteInvoiceMutation,
   useGetQuotationsQuery,
   useCreateQuotationMutation,
   useUpdateQuotationStatusMutation,
+  useDeleteQuotationMutation,
   useGetBrandingQuery,
   useUpdateBrandingMutation,
   useGetAvailabilityQuery,

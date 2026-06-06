@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, UseGuards } from '@nestjs/common';
 import { InvoicesService } from './invoices.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { LogPaymentDto } from './dto/log-payment.dto';
@@ -45,5 +45,11 @@ export class InvoicesController {
     @Body() dto: LogPaymentDto,
   ) {
     return this.invoicesService.logPayment(user.companyId, id, dto);
+  }
+
+  @Delete(':id')
+  @Roles(UserRole.COMPANY_ADMIN)
+  async remove(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.invoicesService.remove(user.companyId, id);
   }
 }

@@ -120,6 +120,18 @@ export class InvoicesService {
     });
   }
 
+  async remove(companyId: string, id: string) {
+    const invoice = await this.findOne(companyId, id);
+    return this.prisma.$transaction(async (tx) => {
+      await tx.payment.deleteMany({
+        where: { invoiceId: invoice.id },
+      });
+      return tx.invoice.delete({
+        where: { id: invoice.id },
+      });
+    });
+  }
+
   async getDashboardStats(companyId: string) {
     const invoices = await this.prisma.invoice.findMany({
       where: { companyId },

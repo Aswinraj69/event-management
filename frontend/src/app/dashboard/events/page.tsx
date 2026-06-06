@@ -282,9 +282,9 @@ export default function EventsPage() {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overflow-y-auto max-h-[600px] min-h-[400px] relative">
           <table className="w-full text-xs">
-            <thead>
+            <thead className="sticky top-0 z-20 shadow-sm bg-[#0a0a12]">
               <tr className="border-b border-white/[0.06]">
                 <th className="pl-4 py-3 w-10"><button onClick={toggleAll} className="text-gray-500 hover:text-white transition-colors">{allSelected ? <CheckSquare className="w-3.5 h-3.5 text-violet-400" /> : <Square className="w-3.5 h-3.5" />}</button></th>
                 {([['clientName', 'Client'], ['title', 'Event']] as [SortCol, string][]).map(([col, label]) => (
@@ -300,7 +300,7 @@ export default function EventsPage() {
                 <th className="px-3 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">Staff</th>
                 <th className="px-3 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-white whitespace-nowrap" onClick={() => handleSort('bookingStatus')}>Status<SortIcon col="bookingStatus" /></th>
                 <th className="px-3 py-3 text-left font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-white whitespace-nowrap" onClick={() => handleSort('createdAt')}>Created<SortIcon col="createdAt" /></th>
-                <th className="px-4 py-3 text-center font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap sticky right-0 bg-[#0a0a12]">Actions</th>
+                <th className="px-4 py-3 text-center font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap sticky right-0 bg-[#0a0a12] z-30">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -337,17 +337,17 @@ export default function EventsPage() {
                   </td>
                   <td className="px-3 py-3.5"><StatusBadge status={b.bookingStatus} /></td>
                   <td className="px-3 py-3.5 text-gray-600 whitespace-nowrap">{fmtDate(b.createdAt)}</td>
-                  <td className="px-4 py-3.5 sticky right-0 bg-[#0a0a12]">
-                    <div className="relative flex justify-center" ref={openActionId === b.id ? actionMenuRef : undefined}>
-                      <button onClick={() => setOpenActionId(openActionId === b.id ? null : b.id)} className="p-1.5 rounded-lg hover:bg-white/10 text-gray-500 hover:text-white transition-all"><MoreVertical className="w-3.5 h-3.5" /></button>
+                  <td className="px-4 py-3.5 sticky right-0 bg-[#0a0a12] z-10 border-l border-white/[0.02]">
+                    <div className="relative flex justify-center items-center" ref={openActionId === b.id ? actionMenuRef : undefined}>
+                      <button onClick={() => setOpenActionId(openActionId === b.id ? null : b.id)} className="p-2 rounded-xl hover:bg-white/10 text-gray-400 hover:text-white transition-all flex items-center justify-center bg-black/20 border border-white/[0.05]"><MoreVertical className="w-4 h-4" /></button>
                       {openActionId === b.id && (
-                        <div className="absolute right-0 top-8 z-50 bg-[#131320] border border-white/10 rounded-xl shadow-2xl py-1 min-w-[140px] animate-fade-in">
-                          <button onClick={() => { setViewingBooking(b); setOpenActionId(null); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-gray-300 hover:bg-white/[0.06] hover:text-white transition-colors"><Eye className="w-3.5 h-3.5 text-blue-400" /> View Details</button>
+                        <div className="absolute right-8 top-0 z-[100] bg-[#1a1a2e] border border-white/10 rounded-xl shadow-2xl py-1.5 min-w-[160px] animate-fade-in">
+                          <button onClick={() => { setViewingBooking(b); setOpenActionId(null); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-gray-300 hover:bg-white/[0.08] hover:text-white transition-colors"><Eye className="w-4 h-4 text-blue-400" /> View Details</button>
                           {isAdmin && <>
-                            <button onClick={() => openEdit(b)} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-gray-300 hover:bg-white/[0.06] hover:text-white transition-colors"><Pencil className="w-3.5 h-3.5 text-violet-400" /> Edit Booking</button>
-                            <button onClick={() => { handleSelectEvent(b); setOpenActionId(null); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-gray-300 hover:bg-white/[0.06] hover:text-white transition-colors"><Users className="w-3.5 h-3.5 text-indigo-400" /> Assign Staff</button>
-                            <div className="border-t border-white/[0.06] my-1" />
-                            <button onClick={() => { setDeleteId(b.id); setOpenActionId(null); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-red-400 hover:bg-red-500/10 transition-colors"><Trash2 className="w-3.5 h-3.5" /> Delete</button>
+                            <button onClick={() => openEdit(b)} className="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-gray-300 hover:bg-white/[0.08] hover:text-white transition-colors"><Pencil className="w-4 h-4 text-violet-400" /> Edit Booking</button>
+                            <button onClick={() => { handleSelectEvent(b); setOpenActionId(null); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-gray-300 hover:bg-white/[0.08] hover:text-white transition-colors"><Users className="w-4 h-4 text-indigo-400" /> Assign Staff</button>
+                            <div className="border-t border-white/[0.08] my-1.5" />
+                            <button onClick={() => { setDeleteId(b.id); setOpenActionId(null); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/15 transition-colors"><Trash2 className="w-4 h-4" /> Delete</button>
                           </>}
                         </div>
                       )}
@@ -381,7 +381,7 @@ export default function EventsPage() {
       {showDrawer && (
         <>
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 animate-fade-in" onClick={() => !saving && setShowDrawer(false)} />
-          <div className="fixed top-0 right-0 h-full w-full max-w-xl bg-[#0d0d1a] border-l border-white/[0.08] shadow-2xl z-50 flex flex-col" style={{ animation: 'slideInRight 0.3s cubic-bezier(0.16,1,0.3,1)' }}>
+          <div className="fixed inset-y-0 right-0 h-[100dvh] w-full max-w-xl bg-[#0d0d1a] border-l border-white/[0.08] shadow-2xl z-50 flex flex-col" style={{ animation: 'slideInRight 0.3s cubic-bezier(0.16,1,0.3,1)' }}>
             <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.08] shrink-0">
               <div><h2 className="text-lg font-bold text-white">{drawerMode === 'create' ? 'New Booking' : 'Edit Booking'}</h2><p className="text-xs text-gray-500 mt-0.5">{drawerMode === 'create' ? 'Create a new event booking record' : 'Update booking details'}</p></div>
               <button onClick={() => !saving && setShowDrawer(false)} className="p-2 rounded-lg hover:bg-white/10 text-gray-500 hover:text-white transition-all"><X className="w-4 h-4" /></button>
@@ -389,9 +389,24 @@ export default function EventsPage() {
             <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
               <Section title="Client Information" icon={<User className="w-3.5 h-3.5" />}>
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="Client Name">{clients.length > 0 ? (<select name="clientId" value={formData.clientId} onChange={handleFormChange} className="form-field"><option value="">— Manual entry —</option>{clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select>) : (<input type="text" name="clientName" placeholder="e.g. John & Sarah" value={formData.clientName} onChange={handleFormChange} className="form-field" />)}</Field>
+                  {clients.length > 0 ? (
+                    <Field label="Select Client">
+                      <select name="clientId" value={formData.clientId} onChange={(e) => { handleFormChange(e); if (e.target.value !== '') setFormData(p => ({ ...p, clientName: '', clientPhone: '' })); }} className="form-field">
+                        <option value="">— Manual entry —</option>
+                        {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                    </Field>
+                  ) : (
+                    <Field label="Client Name">
+                      <input type="text" name="clientName" placeholder="e.g. John & Sarah" value={formData.clientName} onChange={handleFormChange} className="form-field" />
+                    </Field>
+                  )}
                   <Field label="Phone Number"><input type="tel" name="clientPhone" placeholder="+971 50 000 0000" value={formData.clientPhone} onChange={handleFormChange} className="form-field" /></Field>
-                  {formData.clientId && clients.length > 0 && <Field label="Override Name (optional)" className="col-span-2"><input type="text" name="clientName" placeholder="Leave blank to use client record name" value={formData.clientName} onChange={handleFormChange} className="form-field" /></Field>}
+                  {(!formData.clientId || formData.clientId === '') && clients.length > 0 && (
+                    <Field label="Manual Client Name" className="col-span-2">
+                      <input type="text" name="clientName" placeholder="Enter new client name" value={formData.clientName} onChange={handleFormChange} className="form-field" />
+                    </Field>
+                  )}
                 </div>
               </Section>
               <Section title="Event Details" icon={<Calendar className="w-3.5 h-3.5" />}>
@@ -499,27 +514,44 @@ export default function EventsPage() {
 
       {/* ── Staff Assignment Panel ── */}
       {selectedEvent && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-[#0d0d1a] border border-white/[0.08] rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-start justify-between px-6 py-5 border-b border-white/[0.08]">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-[#0d0d1a] border border-white/[0.08] rounded-2xl max-w-lg w-full flex flex-col max-h-[90vh] shadow-2xl overflow-hidden">
+            <div className="flex items-start justify-between px-6 py-5 border-b border-white/[0.08] shrink-0">
               <div><span className="text-[9px] font-bold bg-violet-600/10 border border-violet-500/20 text-violet-400 px-2 py-0.5 rounded-md uppercase">{selectedEvent.type}</span><h3 className="font-bold text-white text-base mt-2">{selectedEvent.title}</h3><p className="text-xs text-gray-500 mt-0.5">{fmtDate(selectedEvent.eventDate)}</p></div>
-              <button onClick={() => setSelectedEvent(null)} className="p-2 rounded-lg hover:bg-white/10 text-gray-500 hover:text-white transition-all"><X className="w-4 h-4" /></button>
+              <button onClick={() => setSelectedEvent(null)} className="p-2.5 bg-white/5 border border-white/10 rounded-full hover:bg-white/15 text-gray-400 hover:text-white transition-all flex items-center justify-center"><X className="w-4 h-4" /></button>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-6 space-y-4 overflow-y-auto flex-1">
               {isAdmin ? (
                 <>
                   <div className="flex justify-between items-center"><h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Roster Allocation</h4><span className="text-[9px] text-gray-600">Double booking protected</span></div>
                   {assignmentError && <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-semibold flex gap-2 items-start"><AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />{assignmentError}</div>}
-                  <div className="space-y-2.5">
+                  <div className="space-y-3">
                     {['Photographer', 'Videographer', 'Drone Operator', 'Editor', 'Coordinator'].map(role => {
                       const currentAssignee = tempAssignments.find(i => i.role === role);
                       const fullStaffRecord = selectedEvent.staffAssignments.find(a => a.role === role);
+                      const matchDesig = (emp: any) => {
+                        const d = emp.employeeProfile?.designation?.toLowerCase() || '';
+                        if (role === 'Drone Operator') return d.includes('drone');
+                        return d.includes(role.toLowerCase());
+                      };
+                      const matchingStaff = employees.filter(matchDesig);
+                      const otherStaff = employees.filter(e => !matchDesig(e));
+                      
                       return (
-                        <div key={role} className="bg-black/20 p-3 rounded-xl border border-white/[0.04]">
-                          <div className="flex justify-between items-center mb-2"><span className="text-[10px] font-bold text-gray-400">{role}</span>{fullStaffRecord && <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full ${fullStaffRecord.status === 'ACCEPTED' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>{fullStaffRecord.status}</span>}</div>
-                          <select value={currentAssignee?.userId || ''} onChange={e => handleRoleSelection(role, e.target.value)} className="w-full bg-black/40 border border-white/[0.08] text-xs text-gray-300 rounded-lg py-1.5 px-2 focus:outline-none">
-                            <option value="">Unassigned</option>
-                            {employees.map(emp => <option key={emp.id} value={emp.id}>{emp.firstName} {emp.lastName} ({emp.employeeProfile?.designation || 'Staff'})</option>)}
+                        <div key={role} className="bg-black/20 p-3.5 rounded-xl border border-white/[0.05]">
+                          <div className="flex justify-between items-center mb-2.5"><span className="text-[11px] font-bold text-gray-300">{role}</span>{fullStaffRecord && <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${fullStaffRecord.status === 'ACCEPTED' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}`}>{fullStaffRecord.status}</span>}</div>
+                          <select value={currentAssignee?.userId || ''} onChange={e => handleRoleSelection(role, e.target.value)} className="w-full bg-black/40 border border-white/[0.08] text-sm text-gray-300 rounded-lg py-2.5 px-3 focus:outline-none focus:border-violet-500/50 transition-colors">
+                            <option value="">— Unassigned —</option>
+                            {matchingStaff.length > 0 && (
+                              <optgroup label={`Available ${role}s`}>
+                                {matchingStaff.map(emp => <option key={emp.id} value={emp.id}>{emp.firstName} {emp.lastName} ({emp.employeeProfile?.designation || 'Staff'})</option>)}
+                              </optgroup>
+                            )}
+                            {otherStaff.length > 0 && (
+                              <optgroup label="Other Staff">
+                                {otherStaff.map(emp => <option key={emp.id} value={emp.id}>{emp.firstName} {emp.lastName} ({emp.employeeProfile?.designation || 'Staff'})</option>)}
+                              </optgroup>
+                            )}
                           </select>
                         </div>
                       );
